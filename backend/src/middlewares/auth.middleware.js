@@ -3,7 +3,7 @@ import { db } from '../libs/db.js'
 
 export const authMiddleware = async (req, res, next) => {
     try {
-        const token = req.cookies.token;
+        const token = req.cookies.accessToken;
 
         if(!token) {
             return res.status(401).json({
@@ -12,7 +12,7 @@ export const authMiddleware = async (req, res, next) => {
             })
         }
 
-        const decoded = jwt.verify(token, process.env.JWT_SECRET)
+        const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
 
         if(!decoded) {
             return res.status(401).json({

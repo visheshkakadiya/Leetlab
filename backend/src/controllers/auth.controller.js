@@ -2,6 +2,39 @@ import bcrypt from "bcryptjs";
 import { db } from "../libs/db.js";
 import { UserRole } from "../generated/prisma/index.js";
 import jwt from "jsonwebtoken"
+import { generateAccessToken, generateRefreshToken, hashPassword, verifyPassword } from "../utils/auth.utils.js";
+
+const generateAccessAndRefreshToken = async (userId) => {
+    try {
+        const user = await db.user.findUnique({
+            where: {
+                id: userId,
+            }
+        })
+        if(!user) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found"
+            })
+        }
+
+        const accessToken = generateAccessToken(user)
+        const refreshToken = generateRefreshToken(user)
+
+        await db.user.update({
+            where: {id: userId},
+            data: {refreshToken}
+        })
+
+        return {accessToken, refreshToken}
+    } catch (error) {
+        console.log("Error generating access and refresh token: ", error)
+        res.status(500).json({
+            success: false,
+            message: "Error generating access and refresh token"
+        })
+    }
+}
 
 const register = async (req, res) => {
     const {name, email, password} = req.body
@@ -20,7 +53,7 @@ const register = async (req, res) => {
             })
         }
 
-        const hashedPassword = await bcrypt.hash(password, 10)
+        const hashedPassword = await hashPassword(password)
 
         const newUser = await db.user.create({
              data: {
@@ -31,18 +64,12 @@ const register = async (req, res) => {
              }
         })
 
-        const token = jwt.sign({id: newUser.id}, process.env.JWT_SECRET, {
-            expiresIn: "7d"
-        })
-
-        const options = {
-            httpOnly: true,
-            sameSite: "strict",
-            secure: process.env.NODE_ENV !== "development",
-            maxAge: 1000 * 60 * 60 * 24 * 7
+        if(!newUser) {
+            return res.status(500).json({
+                success: false,
+                message: "Error creating user"
+            })
         }
-
-        res.cookie("token", token, options)
 
         res.status(201).json({
             success: true,
@@ -57,10 +84,10 @@ const register = async (req, res) => {
         })
 
     } catch (error) {
-        console.log("Error creating user: ", error)
+        console.log("Error registering user: ", error)
         res.status(500).json({
             success: false,
-            message: "Error creating user"
+            message: "Error registering user"
         })
     }
 }
@@ -82,7 +109,7 @@ const login = async (req, res) => {
             })
         }
 
-        const isMatch = await bcrypt.compare(password, user.password)
+        const isMatch = await verifyPassword(password, user.password)
 
         if(!isMatch) {
             return res.status(401).json({
@@ -91,9 +118,7 @@ const login = async (req, res) => {
             })
         }
 
-        const token = jwt.sign({id: user.id}, process.env.JWT_SECRET, {
-            expiresIn: "7d"
-        })
+        const {accessToken, refreshToken} = await generateAccessAndRefreshToken(user.id);
 
         const options = {
             httpOnly: true,
@@ -102,7 +127,8 @@ const login = async (req, res) => {
             maxAge: 1000 * 60 * 60 * 24 * 7
         }
 
-        res.cookie("token", token, options)
+        res.cookie("accessToken", accessToken, options)
+        res.cookie("refreshToken", refreshToken, options)
 
         res.status(200).json({
             success: true,
@@ -134,7 +160,8 @@ const logout = async (req, res) => {
             maxAge: 1000 * 60 * 60 * 24 * 7
         }
 
-        res.clearCookie("token", options)
+        res.clearCookie("accessToken", options)
+        res.clearCookie("refreshToken", options)
 
         res.status(200).json({
             success: true,
