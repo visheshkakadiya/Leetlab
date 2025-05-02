@@ -153,6 +153,16 @@ const login = async (req, res) => {
 
 const logout = async (req, res) => {
     try {
+
+        const {userId} = req.user?.id;
+
+        if(userId) {
+            await db.user.update({
+                where: {id: userId},
+                data: {refreshToken: null}
+            })
+        }
+
         const options = {
             httpOnly: true,
             sameSite: "strict",

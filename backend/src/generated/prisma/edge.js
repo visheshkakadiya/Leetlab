@@ -169,7 +169,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "C:\\Users\\PCS\\OneDrive\\Desktop\\LeetLab\\backend\\src\\generated\\prisma",
+      "value": "C:\\Users\\pcs\\Desktop\\Leetlab\\backend\\src\\generated\\prisma",
       "fromEnvVar": null
     },
     "config": {
@@ -183,7 +183,7 @@ const config = {
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "C:\\Users\\PCS\\OneDrive\\Desktop\\LeetLab\\backend\\prisma\\schema.prisma",
+    "sourceFilePath": "C:\\Users\\pcs\\Desktop\\Leetlab\\backend\\prisma\\schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
@@ -201,7 +201,7 @@ const config = {
     "db": {
       "url": {
         "fromEnvVar": "DATABASE_URL",
-        "value": "postgresql://postgres:prisma@localhost:5432/postgres?schema=public"
+        "value": "postgresql://myuser:mypassword@localhost:5432/postgres"
       }
     }
   },
