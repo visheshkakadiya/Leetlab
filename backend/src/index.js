@@ -16,9 +16,11 @@ app.get("/", (req, res) => {
 
 import authRoutes from "./routes/auth.routes.js";
 import problemRoutes from './routes/problem.routes.js'
+import executionRoute from './routes/executeCode.routes.js'
 
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/problems", problemRoutes)
+app.use("/api/v1/execute-code", executionRoute)
 
 
 app.listen(process.env.PORT, () => {

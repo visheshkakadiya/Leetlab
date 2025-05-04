@@ -72,6 +72,7 @@ export const checkAdmin = async(req, res, next) => {
                 message: "Access denied - Admins only"
             })
         }
+        next();
     } catch (error) {
         console.log("Error checking Admin role: ", error);
         res.status(500).json({

@@ -47,30 +47,30 @@ const createProblem = async (req, res) => {
                     })
                 }
             }
-
-            // saving the problem to the Database
-
-            const newProblem = await db.problem.create({
-                data: {
-                    title,
-                    description, 
-                    difficulty, 
-                    tags, 
-                    examples, 
-                    constraints, 
-                    testcases, 
-                    codeSnippets, 
-                    referenceSolutions,
-                    userId: req.user.id,
-                }
-            });
-
-            return res.status(201).json({
-                success: true,
-                message: "Problem created successfully",
-                problem: newProblem
-            })
         }
+
+        // saving the problem to the Database
+
+        const newProblem = await db.problem.create({
+            data: {
+                title,
+                description,
+                difficulty,
+                tags,
+                examples,
+                constraints,
+                testcases,
+                codeSnippets,
+                referenceSolutions,
+                userId: req.user.id,
+            }
+        });
+
+        return res.status(201).json({
+            success: true,
+            message: "Problem created successfully",
+            problem: newProblem
+        })
 
     } catch (error) {
         console.error("Error creating problem: ", error)
@@ -88,7 +88,7 @@ const getAllProblems = async (req, res) => {
     try {
         const problems = await db.problem.findMany()
 
-        if(!problems) {
+        if (!problems) {
             return res.status(404).json({
                 success: false,
                 error: "No problems found"
@@ -143,30 +143,30 @@ const getProblemById = async (req, res) => {
 
 const updateProblem = async (req, res) => {
     const { id } = req.params;
-    const {title, description, difficulty, tags, examples, constraints, testcases, codeSnippets, referenceSolutions} = req.body;
+    const { title, description, difficulty, tags, examples, constraints, testcases, codeSnippets, referenceSolutions } = req.body;
 
     try {
-        
-        const problem = await db.problem.findUnique({
-            where: {
-                id
-            }
-        })
-        if (!problem) {
+        // Check if the problem exists
+        const existingProblem = await db.problem.findUnique({
+            where: { id }
+        });
+
+        if (!existingProblem) {
             return res.status(404).json({
                 success: false,
                 error: "Problem not found"
-            })
+            });
         }
 
-        for(const [language, solutionCode] of Object.entries(referenceSolutions)) {
+        // Validate all reference solutions using Judge0
+        for (const [language, solutionCode] of Object.entries(referenceSolutions)) {
             const languageId = getJudge0LanguageId(language);
 
             if (!languageId) {
                 return res.status(400).json({
                     success: false,
-                    error: `language ${language} is not supported`
-                })
+                    error: `Language "${language}" is not supported`
+                });
             }
 
             const submissions = testcases.map(({ input, output }) => ({
@@ -174,58 +174,58 @@ const updateProblem = async (req, res) => {
                 language_id: languageId,
                 stdin: input,
                 expected_output: output,
-            }))
+            }));
 
             const submissionResults = await submitBatch(submissions);
-
             const tokens = submissionResults.map((res) => res.token);
             const results = await pollBatchResults(tokens);
 
-            for(let i = 0; i < results.length; i++) {
+            for (let i = 0; i < results.length; i++) {
                 const result = results[i];
 
-                if(result.status.id !== 3) {
+                if (result.status.id !== 3) { // 3 = Accepted
                     return res.status(400).json({
-                        error: `Testcase ${i + 1} failed for language ${language}`
-                    })
+                        success: false,
+                        error: `Testcase ${i + 1} failed for language "${language}"`,
+                        details: result
+                    });
                 }
             }
-
-            const updatedProblem = await db.problem.update({
-                where: {
-                    id,
-                },
-                data: {
-                    title,
-                    description, 
-                    difficulty, 
-                    tags, 
-                    examples, 
-                    constraints, 
-                    testcases, 
-                    codeSnippets, 
-                    referenceSolutions,
-                }
-            })
-
-            return res.status(200).json({
-                success: true,
-                message: "Problem updated successfully",
-                problem: updatedProblem
-            })
         }
 
+        // All languages passed testcases – proceed with update
+        const updatedProblem = await db.problem.update({
+            where: { id },
+            data: {
+                title,
+                description,
+                difficulty,
+                tags,
+                examples,
+                constraints,
+                testcases,
+                codeSnippets,
+                referenceSolutions
+            }
+        });
+
+        return res.status(200).json({
+            success: true,
+            message: "Problem updated successfully",
+            problem: updatedProblem
+        });
+
     } catch (error) {
-        console.error("Error updating problem: ", error)
+        console.error("Error updating problem: ", error);
         return res.status(500).json({
             success: false,
-            error: "Error While updating problem"
-        })
+            error: "Error while updating problem"
+        });
     }
-}
+};
 
 const deleteProblem = async (req, res) => {
-    const { id } = req.params;
+    const id = req.params;
 
     try {
         const problem = await db.problem.findUnique({
@@ -241,9 +241,11 @@ const deleteProblem = async (req, res) => {
             })
         }
 
-        await db.problem.delete({where: {
-            id,
-        }})
+        await db.problem.delete({
+            where: {
+                id,
+            }
+        })
 
         return res.status(200).json({
             success: true,
@@ -281,7 +283,7 @@ const getAllProblemsSolvedByUser = async (req, res) => {
             success: false,
             error: "Error While fetching problems solved by user"
         })
-        
+
     }
 }
 
