@@ -104,9 +104,38 @@ const executeCode = async (req, res) => {
             })
         }
 
+        // 8. Save individual test case results using detailedResults
+
+        const testCaseResults = detailedResults.map((result) => ({
+            submissionId: submission.id,
+            testCase: result.testCase,
+            passed: result.passed,
+            stdout: result.stdout,
+            expected: result.expected,
+            stderr: result.stderr,
+            complieOutput: result.compile_output,
+            status: result.status,
+            memory: result.memory,
+            time: result.time
+        }))
+
+        await db.testCaseResult.createMany({
+            data: testCaseResults,
+        })
+
+        const submissionWithTestCase = await db.submission.findUnque({
+            where: {
+                id: submission.id,
+            },
+            include: {
+                testCases: true,
+            }
+        })
+
         res.status(200).json({
             success: true,
             message: "Code executed successfully",
+            submission: submissionWithTestCase,
         })
 
     } catch (error) {

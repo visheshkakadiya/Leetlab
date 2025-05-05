@@ -266,7 +266,18 @@ const getAllProblemsSolvedByUser = async (req, res) => {
     try {
         const problems = await db.problem.findMany({
             where: {
-                userId: id,
+                solvedBy: {
+                    some: {
+                        userId: id,
+                    }
+                }
+            },
+            include: {
+                solvedBy: {
+                    where: {
+                        userId: id,
+                    }
+                }
             }
         })
 
@@ -276,6 +287,12 @@ const getAllProblemsSolvedByUser = async (req, res) => {
                 error: "No problems found"
             })
         }
+
+        res.status(200).json({
+            success: true,
+            message: "Problems fetched successfully",
+            problems
+        })
 
     } catch (error) {
         console.error("Error fetching problems solved by user: ", error)
