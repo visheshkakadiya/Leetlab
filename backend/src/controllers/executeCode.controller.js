@@ -54,7 +54,7 @@ const executeCode = async (req, res) => {
                 stderr: result.stderr || null,
                 compile_output: result.compile_output || null,
                 status: result.status.description,
-                memeory: result.memory ? `${result.memory} KB` : undefined,
+                memory: result.memory ? `${result.memory} KB` : undefined,
                 time: result.time ? `${result.time} sec` : undefined,
             }
 
@@ -77,7 +77,7 @@ const executeCode = async (req, res) => {
                 stdout: JSON.stringify(detailedResults.map((r) => r.stdout)),
                 stderr: detailedResults.some((r) => r.stderr)
                 ? JSON.stringify(detailedResults.map((r) => r.stderr)) : null,
-                complieOutput: detailedResults.some((r) => r.compile_output)
+                compileOutput: detailedResults.some((r) => r.compile_output)
                 ? JSON.stringify(detailedResults.map((r) => r.compile_output)) : null,
                 status: allPassed ? "Accepted" : "Wrong Answer",
                 memory: detailedResults.some((r) => r.memory)
@@ -113,7 +113,7 @@ const executeCode = async (req, res) => {
             stdout: result.stdout,
             expected: result.expected,
             stderr: result.stderr,
-            complieOutput: result.compile_output,
+            compileOutput: result.compile_output,
             status: result.status,
             memory: result.memory,
             time: result.time
@@ -123,7 +123,7 @@ const executeCode = async (req, res) => {
             data: testCaseResults,
         })
 
-        const submissionWithTestCase = await db.submission.findUnque({
+        const submissionWithTestCase = await db.submission.findUnique({
             where: {
                 id: submission.id,
             },

@@ -74,7 +74,7 @@ model Submission {
   sourceCode    Json
   language      String
   stdin         String?
-  Stdout        String?
+  stdout        String?
   stderr        String?
   compileOutput String?
   status        String // Accepted, wrong answer
