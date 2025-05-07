@@ -7,6 +7,7 @@ import asyncHandler from '../utils/asyncHandler.js'
 import ApiError from "../utils/ApiError.js";
 import ApiResponse from '../utils/ApiResponse.js'
 import { forgotPasswordGenContent, sendMail } from "../utils/mail.js";
+import { uploadOnCloudinary } from "../utils/cloudinary.js";
 
 const generateAccessAndRefreshToken = async (userId) => {
     try {
@@ -59,11 +60,31 @@ const register = async (req, res) => {
 
         const hashedPassword = await hashPassword(password)
 
+        const avatarLocalPath = req.file?.path;
+
+        if (!avatarLocalPath) {
+            return res.status(400).json({
+                success: false,
+                message: "Avatar is required"
+            })
+        }
+
+        const avatar = await uploadOnCloudinary(avatarLocalPath);
+
+        if (!avatar) {
+            return res.status(500).json({
+                success: false,
+                message: "Error uploading avatar"
+            })
+        }
+
         const newUser = await db.user.create({
             data: {
                 email,
                 name,
                 password: hashedPassword,
+                imageUrl: avatar.secure_url,
+                imageId: avatar.public_id,
                 role: UserRole.USER
             }
         })

@@ -29,7 +29,8 @@ model User {
   id           String   @id @default(uuid())
   name         String?
   email        String   @unique
-  image        String?
+  imageUrl     String?
+  imageId      String?
   role         UserRole @default(USER)
   password     String
   refreshToken String   @default("")
