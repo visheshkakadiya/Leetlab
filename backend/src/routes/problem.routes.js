@@ -1,5 +1,5 @@
 import express from 'express';
-import { authMiddleware, checkAdmin } from '../middlewares/auth.middleware.js';
+import { authMiddleware } from '../middlewares/auth.middleware.js';
 import { 
     createProblem, 
     getAllProblems, 
@@ -11,7 +11,7 @@ import {
 
 const router = express.Router();
 
-router.post('/create-problem', authMiddleware, checkAdmin, createProblem);
+router.post('/create-problem', authMiddleware, createProblem);
 
 router.get('/get-allProblems', authMiddleware, getAllProblems);
 
