@@ -1,5 +1,4 @@
 import jwt from 'jsonwebtoken'
-import { db } from '../libs/db.js'
 
 export const authMiddleware = async (req, res, next) => {
     try {
@@ -21,27 +20,7 @@ export const authMiddleware = async (req, res, next) => {
             })
         }
 
-        const user = await db.user.findUnique({
-            where: {
-                id: decoded.id,
-            },
-            select: {
-                id: true,
-                image: true,
-                name: true,
-                email: true,
-                role: true
-            }
-        })
-
-        if(!user) {
-            return res.status(401).json({
-                success: false,
-                message: "User not found"
-            })
-        }
-
-        req.user = user;
+        req.user = decoded;
         next()
 
     } catch (error) {

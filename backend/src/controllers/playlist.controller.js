@@ -1,14 +1,14 @@
 import { db } from "../libs/db.js";
+import ApiError from "../utils/ApiError.js";
+import ApiResponse from "../utils/ApiResponse.js"
+import asyncHandler from "../utils/asyncHandler.js";
 
-const createPlaylist = async (req, res) => {
-    try {
+const createPlaylist = asyncHandler(async (req, res) => {
+
         const { name,  description} = req.body;
 
         if (!name || !description) {
-            return res.status(400).json({
-                success: false,
-                error: "Name and description are required",
-            })
+            throw new ApiError(400, "Name and description are required");
         }
 
         const userId = req.user.id;
@@ -22,38 +22,29 @@ const createPlaylist = async (req, res) => {
         })
 
         if (!playlist) {
-            return res.status(400).json({
-                success: false,
-                error: "Error creating playlist",
-            })
+            throw new ApiError(500, "Error creating playlist");
         }
 
-        res.status(201).json({
-            success: true,
-            message: "Playlist created successfully",
-            playlist,
-        })
+        res.status(201).json(
+            new ApiResponse(
+                201,
+                {
+                    id: playlist.id,
+                    name: playlist.name,
+                    description: playlist.description,
+                },
+                "Playlist created successfully"
+            )
+        )
+});
 
-    } catch (error) {
-        console.error("Error creating playlist: ", error);
-        return res.status(500).json({
-            success: false,
-            error: "Error creating playlist",
-        })
-    }
-}
+const updatePlaylist = asyncHandler(async (req, res) => {
 
-const updatePlaylist = async (req, res) => {
     const { playlistId } = req.params;
     const { name, description } = req.body;
 
-    try {
-
         if (!name || !description) {
-            return res.status(400).json({
-                success: false,
-                error: "Name and description are required",
-            })
+            throw new ApiError(400, "Name and description are required");
         }
 
         const playlist = await db.playlist.findUnique({
@@ -63,10 +54,7 @@ const updatePlaylist = async (req, res) => {
         })
 
         if (!playlist) {
-            return res.status(404).json({
-                success: false,
-                error: "Playlist not found",
-            })
+            throw new ApiError(404, "Playlist not found");
         }
 
         const updatedPlaylist = await db.playlist.update({
@@ -79,21 +67,18 @@ const updatePlaylist = async (req, res) => {
             }
         })
 
-        res.status(200).json({
-            success: true,
-            message: "Playlist updated successfully",
-            playlist: updatedPlaylist,
-        })
-
-    } catch (error) {
-        console.error("Error updating playlist: ", error);
-        return res.status(500).json({
-            success: false,
-            error: "Error updating playlist",
-        })
-        
-    }
-}
+        res.status(200).json(
+            new ApiResponse(
+                200,
+                {
+                    id: updatedPlaylist.id,
+                    name: updatedPlaylist.name,
+                    description: updatedPlaylist.description,
+                },
+                "Playlist updated successfully"
+            )
+        )
+});
 
 const getAllPlaylists = async (req, res) => {
     try {
@@ -357,5 +342,6 @@ export {
     getPlaylistDetails,
     addProblemToPlaylist,
     removeProblemFromPlaylist,
+    updatePlaylist,
     deletePlaylist,
 }

@@ -3,7 +3,7 @@ import {
     login, 
     logout, 
     register,
-    check,
+    currentUser,
     refreshAccessToken,
     resetPassword,
     forgotPassword,
@@ -25,7 +25,7 @@ const router = express.Router();
 router.post("/register", validate(registerSchema), upload.single('avatar'), register)
 router.post("/login", validate(loginSchema), login)
 router.post("/logout", authMiddleware, logout)
-router.get("/check", authMiddleware, check)
+router.get("/me", authMiddleware, currentUser)
 router.post("/refreshToken", refreshAccessToken)
 router.post("/forgot-password", validate(forgotPasswordSchema), forgotPassword)
 router.post("/reset-password/:token", validate(resetPasswordSchema), resetPassword)

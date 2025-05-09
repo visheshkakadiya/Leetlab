@@ -145,6 +145,13 @@ const updateProblem = async (req, res) => {
     const { id } = req.params;
     const { title, description, difficulty, tags, examples, constraints, testcases, codeSnippets, referenceSolutions } = req.body;
 
+    if (req.user.role !== 'ADMIN') {
+        return res.status(403).json({
+            success: false,
+            error: "You are not allowed to update problem"
+        })
+    }
+
     try {
         // Check if the problem exists
         const existingProblem = await db.problem.findUnique({
@@ -226,6 +233,13 @@ const updateProblem = async (req, res) => {
 
 const deleteProblem = async (req, res) => {
     const {id} = req.params;
+
+    if (req.user.role !== 'ADMIN') {
+        return res.status(403).json({
+            success: false,
+            error: "You are not allowed to delete problem"
+        })
+    }
 
     try {
         const problem = await db.problem.findUnique({
