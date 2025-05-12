@@ -1,322 +1,192 @@
 import { db } from "../libs/db.js";
+import { runReferenceCode } from "../libs/executeRefCode.js";
 import { getJudge0LanguageId, pollBatchResults, submitBatch } from "../libs/judge0.lib.js";
+import asyncHandler from "../utils/asyncHandler.js";
+import ApiError from "../utils/ApiError.js";
+import ApiResponse from "../utils/ApiResponse.js";
 
-const createProblem = async (req, res) => {
+const createProblem = asyncHandler(async (req, res) => {
     // get all data from request body
     const { title, description, difficulty, tags, examples, constraints, testcases, codeSnippets, referenceSolutions } = req.body
 
     if (req.user.role !== 'ADMIN') {
-        return res.status(403).json({
-            success: false,
-            error: "You are not allowed to create problem"
-        })
+        throw new ApiError(403, "You are not allowed to create problem")
     }
 
-    try {
-
-        for (const [language, solutionCode] of Object.entries(referenceSolutions)) {
-            const languageId = getJudge0LanguageId(language);
-
-            if (!languageId) {
-                return res.status(400).json({
-                    success: false,
-                    error: `language ${language} is not supported`
-                })
-            }
-
-            const submissions = testcases.map(({ input, output }) => ({
-                source_code: solutionCode,
-                language_id: languageId,
-                stdin: input,
-                expected_output: output,
-            }))
-
-            const submissionResults = await submitBatch(submissions)
-
-            const tokens = submissionResults.map((res) => res.token);
-
-            const results = await pollBatchResults(tokens);
-
-            for (let i = 0; i < results.length; i++) {
-                const result = results[i];
-                console.log("Result: ", results)
-
-                if (result.status.id !== 3) {
-                    return res.status(400).json({
-                        error: `Testcase ${i + 1} failed for language ${language}`
-                    })
-                }
-            }
+    const existedProblem = await db.problem.findUnique({
+        where: {
+            title,
         }
+    })
 
-        // saving the problem to the Database
-
-        const newProblem = await db.problem.create({
-            data: {
-                title,
-                description,
-                difficulty,
-                tags,
-                examples,
-                constraints,
-                testcases,
-                codeSnippets,
-                referenceSolutions,
-                userId: req.user.id,
-            }
-        });
-
-        return res.status(201).json({
-            success: true,
-            message: "Problem created successfully",
-            problem: newProblem
-        })
-
-    } catch (error) {
-        console.error("Error creating problem: ", error)
-        return res.status(500).json({
-            success: false,
-            error: "Internal server error"
-        })
+    if (existedProblem) {
+        throw new ApiError(400, "Problem with this title already exists")
     }
 
-    // check for role of user is it Admin or not
-    // loop through each and every refrence solution for every languages
-}
+    runReferenceCode(referenceSolutions, testcases)
 
-const getAllProblems = async (req, res) => {
-    try {
-        const problems = await db.problem.findMany()
-
-        if (!problems) {
-            return res.status(404).json({
-                success: false,
-                error: "No problems found"
-            })
+    // saving the problem to the Database
+    const newProblem = await db.problem.create({
+        data: {
+            title,
+            description,
+            difficulty,
+            tags,
+            examples,
+            constraints,
+            testcases,
+            codeSnippets,
+            referenceSolutions,
+            userId: req.user.id,
         }
+    });
 
-        res.status(200).json({
-            success: true,
-            message: "Problems fetched successfully",
-            problems
-        })
+    return res.status(201).json(
+        new ApiResponse(201, newProblem, "Problem created successfully")
+    )
+});
 
-    } catch (error) {
-        console.error("Error fetching problems: ", error)
-        return res.status(500).json({
-            success: false,
-            error: "Error While fetching problems"
-        })
+const getAllProblems = asyncHandler(async (req, res) => {
+
+    const problems = await db.problem.findMany()
+
+    if (!problems) {
+        throw new ApiError(404, "No problems found")
     }
-}
 
-const getProblemById = async (req, res) => {
+    res.status(200).json(
+        new ApiResponse(200, problems, "Problems fetched successfully")
+    )
+});
+
+const getProblemById = asyncHandler(async (req, res) => {
     const { id } = req.params;
 
-    try {
-        const problem = await db.problem.findUnique({
-            where: {
-                id,
-            }
-        })
-
-        if (!problem) {
-            return res.status(404).json({
-                success: false,
-                error: "Problem not found"
-            })
+    const problem = await db.problem.findUnique({
+        where: {
+            id,
         }
-        res.status(200).json({
-            success: true,
-            message: "Problem fetched successfully",
-            problem
-        })
+    })
 
-    } catch (error) {
-        console.error("Error fetching problem: ", error)
-        return res.status(500).json({
-            success: false,
-            error: "Error While fetching problem by id"
-        })
+    if (!problem) {
+        throw new ApiError(404, "Problem not found")
     }
-}
+    res.status(200).json(
+        new ApiResponse(200, problem, "Problem fetched successfully")
+    )
+});
 
-const updateProblem = async (req, res) => {
+const updateProblem = asyncHandler(async (req, res) => {
     const { id } = req.params;
     const { title, description, difficulty, tags, examples, constraints, testcases, codeSnippets, referenceSolutions } = req.body;
 
     if (req.user.role !== 'ADMIN') {
-        return res.status(403).json({
-            success: false,
-            error: "You are not allowed to update problem"
-        })
+        throw new ApiError(403, "You are not allowed to update problem")
     }
 
-    try {
-        // Check if the problem exists
-        const existingProblem = await db.problem.findUnique({
-            where: { id }
-        });
+    // Check if the problem exists
+    const CheckProblem = await db.problem.findUnique({
+        where: { id }
+    });
 
-        if (!existingProblem) {
-            return res.status(404).json({
-                success: false,
-                error: "Problem not found"
-            });
-        }
-
-        // Validate all reference solutions using Judge0
-        for (const [language, solutionCode] of Object.entries(referenceSolutions)) {
-            const languageId = getJudge0LanguageId(language);
-
-            if (!languageId) {
-                return res.status(400).json({
-                    success: false,
-                    error: `Language "${language}" is not supported`
-                });
-            }
-
-            const submissions = testcases.map(({ input, output }) => ({
-                source_code: solutionCode,
-                language_id: languageId,
-                stdin: input,
-                expected_output: output,
-            }));
-
-            const submissionResults = await submitBatch(submissions);
-            const tokens = submissionResults.map((res) => res.token);
-            const results = await pollBatchResults(tokens);
-
-            for (let i = 0; i < results.length; i++) {
-                const result = results[i];
-
-                if (result.status.id !== 3) { // 3 = Accepted
-                    return res.status(400).json({
-                        success: false,
-                        error: `Testcase ${i + 1} failed for language "${language}"`,
-                        details: result
-                    });
-                }
-            }
-        }
-
-        // All languages passed testcases – proceed with update
-        const updatedProblem = await db.problem.update({
-            where: { id },
-            data: {
-                title,
-                description,
-                difficulty,
-                tags,
-                examples,
-                constraints,
-                testcases,
-                codeSnippets,
-                referenceSolutions
-            }
-        });
-
-        return res.status(200).json({
-            success: true,
-            message: "Problem updated successfully",
-            problem: updatedProblem
-        });
-
-    } catch (error) {
-        console.error("Error updating problem: ", error);
-        return res.status(500).json({
-            success: false,
-            error: "Error while updating problem"
-        });
+    if (!CheckProblem) {
+        throw new ApiError(404, "Problem not found");
     }
-};
 
-const deleteProblem = async (req, res) => {
-    const {id} = req.params;
+    if (
+        [title, description, difficulty, tags, examples, constraints, testcases, codeSnippets, referenceSolutions].some((field) => field === undefined)
+    ) {
+        throw new ApiError(400, "Please provide any one field to update");
+    }
+
+    // Validate all reference solutions using Judge0
+    runReferenceCode(referenceSolutions, testcases)
+
+    // All languages passed testcases – proceed with update
+    const updatedProblem = await db.problem.update({
+        where: { id },
+        data: {
+            title,
+            description,
+            difficulty,
+            tags,
+            examples,
+            constraints,
+            testcases,
+            codeSnippets,
+            referenceSolutions
+        }
+    });
+
+    if (!updatedProblem) {
+        throw new ApiError(500, "Error updating problem");
+    }
+
+    return res.status(200).json(
+        new ApiResponse(200, updatedProblem, "Problem updated successfully")
+    );
+});
+
+const deleteProblem = asyncHandler(async (req, res) => {
+    const { id } = req.params;
 
     if (req.user.role !== 'ADMIN') {
-        return res.status(403).json({
-            success: false,
-            error: "You are not allowed to delete problem"
-        })
+        throw new ApiError(403, "You are not allowed to delete problem")
     }
 
-    try {
-        const problem = await db.problem.findUnique({
-            where: {
-                id
-            }
-        })
-
-        if (!problem) {
-            return res.status(404).json({
-                success: false,
-                error: "Problem not found"
-            })
+    const problem = await db.problem.findUnique({
+        where: {
+            id
         }
+    })
 
-        await db.problem.delete({
-            where: {
-                id,
-            }
-        })
-
-        return res.status(200).json({
-            success: true,
-            message: "Problem deleted successfully"
-        })
-    } catch (error) {
-        console.error("Error deleting problem: ", error)
-        return res.status(500).json({
-            success: false,
-            error: "Error While deleting problem"
-        })
+    if (!problem) {
+        throw new ApiError(404, "Problem not found")
     }
-}
 
-const getAllProblemsSolvedByUser = async (req, res) => {
+    const deletedProblem = await db.problem.delete({
+        where: {
+            id,
+        }
+    });
+
+    if (!deletedProblem) {
+        throw new ApiError(500, "Error deleting problem")
+    }
+
+    return res.status(200).json(
+        new ApiResponse(200, null, "Problem deleted successfully")
+    )
+});
+
+const getAllProblemsSolvedByUser = asyncHandler(async (req, res) => {
     const { id } = req.user.id
 
-    try {
-        const problems = await db.problem.findMany({
-            where: {
-                solvedBy: {
-                    some: {
-                        userId: id,
-                    }
-                }
-            },
-            include: {
-                solvedBy: {
-                    where: {
-                        userId: id,
-                    }
+    const problems = await db.problem.findMany({
+        where: {
+            solvedBy: {
+                some: {
+                    userId: id,
                 }
             }
-        })
-
-        if (!problems) {
-            return res.status(404).json({
-                success: false,
-                error: "No problems found"
-            })
+        },
+        include: {
+            solvedBy: {
+                where: {
+                    userId: id,
+                }
+            }
         }
+    })
 
-        res.status(200).json({
-            success: true,
-            message: "Problems fetched successfully",
-            problems
-        })
-
-    } catch (error) {
-        console.error("Error fetching problems solved by user: ", error)
-        return res.status(500).json({
-            success: false,
-            error: "Error While fetching problems solved by user"
-        })
-
+    if (!problems) {
+        throw new ApiError(404, "No problems found")
     }
-}
+
+    res.status(200).json(
+        new ApiResponse(200, problems, "Problems fetched successfully")
+    )
+});
 
 export {
     createProblem,

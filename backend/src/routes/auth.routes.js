@@ -18,7 +18,7 @@ import {
     registerSchema,
     resetPasswordSchema,
     updateProfileSchema
-} from "../validators/validate.js"
+} from "../validators/auth.validate.js"
 
 const router = express.Router();
 
@@ -29,6 +29,6 @@ router.get("/me", authMiddleware, currentUser)
 router.post("/refreshToken", refreshAccessToken)
 router.post("/forgot-password", validate(forgotPasswordSchema), forgotPassword)
 router.post("/reset-password/:token", validate(resetPasswordSchema), resetPassword)
-router.post("/update-profile", authMiddleware, validate(updateProfileSchema), updateProfile)
+router.post("/update-profile", validate(updateProfileSchema), authMiddleware, updateProfile)
 
 export default router
