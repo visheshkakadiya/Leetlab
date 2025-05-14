@@ -106,6 +106,10 @@ const register = asyncHandler(async (req, res) => {
 const login = asyncHandler(async (req, res) => {
     const { email, password } = req.body;
 
+    if (!email || !password) {
+        throw new ApiError(400, "Please provide email and password");
+    }
+
     const user = await db.user.findUnique({
         where: {
             email,
