@@ -124,6 +124,7 @@ exports.Prisma.UserScalarFieldEnum = {
   imageUrl: 'imageUrl',
   imageId: 'imageId',
   role: 'role',
+  OTP: 'OTP',
   password: 'password',
   refreshToken: 'refreshToken',
   resetPasswordToken: 'resetPasswordToken',
@@ -209,6 +210,27 @@ exports.Prisma.ProblemInPlaylistScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.DiscussionScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  title: 'title',
+  content: 'content',
+  views: 'views',
+  upvotes: 'upvotes',
+  downvotes: 'downvotes',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.ReplyScalarFieldEnum = {
+  id: 'id',
+  discussionId: 'discussionId',
+  userId: 'userId',
+  content: 'content',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -251,7 +273,9 @@ exports.Prisma.ModelName = {
   TestCaseResult: 'TestCaseResult',
   ProblemSolved: 'ProblemSolved',
   Playlist: 'Playlist',
-  ProblemInPlaylist: 'ProblemInPlaylist'
+  ProblemInPlaylist: 'ProblemInPlaylist',
+  Discussion: 'Discussion',
+  Reply: 'Reply'
 };
 
 /**

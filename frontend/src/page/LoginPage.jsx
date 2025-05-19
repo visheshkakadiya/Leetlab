@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { LoginSchema } from '../schemas/authValidate.js';
 import { useSelector, useDispatch } from 'react-redux'
-import { loginUser, currenUser } from '../store/Slices/authSlice.js';
+import { loginUser, currentUser } from '../store/Slices/authSlice.js';
 
 export default function LoginPage() {
 
@@ -21,9 +21,9 @@ export default function LoginPage() {
   });
 
   const onSubmit = async (data) => {
-    
+
     const login = await dispatch(loginUser(data));
-    const user = await dispatch(currenUser());
+    const user = await dispatch(currentUser());
 
     if (login?.payload && user?.payload) {
       navigate('/');
@@ -58,41 +58,41 @@ export default function LoginPage() {
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
               {/* Email Input */}
               <div className="space-y-2">
-  <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-    Email
-  </label>
-  <div className="relative">
-    <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-      <Mail className="h-5 w-5 text-gray-400" />
-    </div>
-    <input
-      type="email"
-      placeholder="Enter your Email"
-      {...register("email")}
-      className={`block w-full rounded-md border ${errors.email ? "border-red-500" : "border-gray-300"} py-2 pl-10 pr-3 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:outline-none focus:ring-blue-500`}
-    />
-  </div>
-  {errors.email && <p className="text-sm text-red-500">{errors.email.message}</p>}
-</div>
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                  Email
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                    <Mail className="h-5 w-5 text-gray-400" />
+                  </div>
+                  <input
+                    type="email"
+                    placeholder="Enter your Email"
+                    {...register("email")}
+                    className={`block w-full rounded-md border ${errors.email ? "border-red-500" : "border-gray-300"} py-2 pl-10 pr-3 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:outline-none focus:ring-blue-500`}
+                  />
+                </div>
+                {errors.email && <p className="text-sm text-red-500">{errors.email.message}</p>}
+              </div>
 
-{/* Password Input */}
-<div className="space-y-1">
-  <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-    Password
-  </label>
-  <div className="relative">
-    <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-      <Lock className="h-5 w-5 text-gray-400" />
-    </div>
-    <input
-      type="password"
-      placeholder="Enter your Password"
-      {...register("password")}
-      className={`block w-full rounded-md border ${errors.password ? "border-red-500" : "border-gray-300"} py-2 pl-10 pr-3 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:outline-none focus:ring-blue-500`}
-    />
-  </div>
-  {errors.password && <p className="text-sm text-red-500">{errors.password.message}</p>}
-</div>
+              {/* Password Input */}
+              <div className="space-y-1">
+                <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                  Password
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                    <Lock className="h-5 w-5 text-gray-400" />
+                  </div>
+                  <input
+                    type="password"
+                    placeholder="Enter your Password"
+                    {...register("password")}
+                    className={`block w-full rounded-md border ${errors.password ? "border-red-500" : "border-gray-300"} py-2 pl-10 pr-3 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:outline-none focus:ring-blue-500`}
+                  />
+                </div>
+                {errors.password && <p className="text-sm text-red-500">{errors.password.message}</p>}
+              </div>
 
               {/* Remember me + Forgot password */}
               <div className="flex items-center justify-between">

@@ -61,7 +61,7 @@ export const refreshAccessToken = createAsyncThunk("refreshAccessToken", async (
     }
 })
 
-export const currenUser = createAsyncThunk("currentUser", async () => {
+export const currentUser = createAsyncThunk("currentUser", async () => {
     const response = await axiosInstance.get("/auth/me");
     return response.data.data;
 })
@@ -124,7 +124,7 @@ const authSlice = createSlice({
             .addCase(loginUser.fulfilled, (state, action) => {
                 state.isLoading = false;
                 state.user = action.payload;
-                state.status = false;
+                state.status = true;
             })
             .addCase(loginUser.rejected, (state, action) => {
                 state.isLoading = false;
@@ -139,14 +139,31 @@ const authSlice = createSlice({
                 state.user = null;
                 state.status = false;
             })
-            .addCase(currenUser.pending, (state) => {
+            .addCase(currentUser.pending, (state) => {
                 state.isLoading = true;
                 state.status = false;
             })
-            .addCase(currenUser.fulfilled, (state, action) => {
+            .addCase(currentUser.fulfilled, (state, action) => {
                 state.isLoading = false;
                 state.user = action.payload;
                 state.status = true;
+            })
+            .addCase(currentUser.rejected, (state, action) => {
+                state.isLoading = false;
+                state.status = false;
+                state.error = action.error.message;
+            })
+            .addCase(refreshAccessToken.pending, (state) => {
+                state.isLoading = true;
+                state.error = null;
+            })
+            .addCase(refreshAccessToken.fulfilled, (state, action) => {
+                state.isLoading = false;
+                state.user = action.payload;
+            })
+            .addCase(refreshAccessToken.rejected, (state, action) => {
+                state.isLoading = false;
+                state.error = action.error.message;
             })
             .addCase(forgotPassword.pending, (state) => {
                 state.isLoading = true;

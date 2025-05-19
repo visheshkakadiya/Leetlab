@@ -1,29 +1,54 @@
-import React from 'react'
-import {Navigate, Route, Routes} from 'react-router-dom'
+import React, { useEffect } from 'react'
+import { Navigate, Route, Routes } from 'react-router-dom'
 import HomePage from './page/HomePage'
 import LoginPage from './page/LoginPage'
 import SignUpPage from './page/SignUpPage'
-import {useDispatch} from 'react-redux'
-import { currenUser } from './store/Slices/authSlice.js'
+import { useDispatch } from 'react-redux'
+import Layout from "./Layout/Layout.jsx"
+import { Toaster } from 'react-hot-toast'
+import AuthLayout from './components/AuthLayout.jsx'
+import AddProblem from './page/AddProblemPage.jsx'
 
 const App = () => {
 
-  const dispatch = useDispatch();
+
 
   return (
     <div className='flex flex-col items-center justify-center'>
+      <Toaster />
       <Routes>
-        <Route 
+        <Route
           path='/'
-          element={<HomePage />}
-        />
-        <Route 
+          element={<Layout />}>
+          <Route path='' element={
+            <AuthLayout authentication={false}>
+              <HomePage />
+            </AuthLayout>
+          } />
+        </Route>
+        <Route
           path='/login'
-          element={<LoginPage />}
+          element={
+            <AuthLayout authentication={false}>
+              <LoginPage />
+            </AuthLayout>
+          }
         />
-        <Route 
+        <Route
           path='/signup'
-          element={<SignUpPage />}
+          element={
+            <AuthLayout authentication={false}>
+              <SignUpPage />
+            </AuthLayout>
+          }
+        />
+        <Route
+          path='/create-problem'
+          element={
+            <AuthLayout authentication={true}>
+              <AddProblem />
+            </AuthLayout>
+          }
         />
       </Routes>
     </div>
