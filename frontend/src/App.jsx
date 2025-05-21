@@ -8,10 +8,15 @@ import Layout from "./Layout/Layout.jsx"
 import { Toaster } from 'react-hot-toast'
 import AuthLayout from './components/AuthLayout.jsx'
 import AddProblem from './page/AddProblemPage.jsx'
+import { currentUser } from './store/Slices/authSlice.js'
 
 const App = () => {
 
+  const dispatch = useDispatch();
 
+  useEffect(() => {
+    dispatch(currentUser())
+  })
 
   return (
     <div className='flex flex-col items-center justify-center'>

@@ -13,7 +13,7 @@ const createProblem = asyncHandler(async (req, res) => {
         throw new ApiError(403, "You are not allowed to create problem")
     }
 
-    const existedProblem = await db.problem.findUnique({
+    const existedProblem = await db.problem.findFirst({
         where: {
             title,
         }

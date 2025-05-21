@@ -25,8 +25,8 @@ export default function LoginPage() {
     const login = await dispatch(loginUser(data));
     const user = await dispatch(currentUser());
 
-    if (login?.payload && user?.payload) {
-      navigate('/');
+    if (user && login?.payload) {
+      navigate("/");
     }
   };
 

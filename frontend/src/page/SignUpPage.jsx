@@ -22,10 +22,13 @@ export default function SignupForm() {
   const loading = useSelector((state) => state.auth?.isLoading);
 
   const onSubmit = async (data) => {
-    const register = await dispatch(registerUser(data));
-    if (register?.payload) {
-      const login = await dispatch(loginUser(data));
-      if (login?.payload) {
+    const response = await dispatch(registerUser(data));
+    if (response?.payload?.success) {
+      const username = data?.username;
+      const password = data?.password;
+      const loginResult = await dispatch(loginUser({ username, password }));
+
+      if (loginResult?.type === "login/fulfilled") {
         navigate("/");
       }
     }
@@ -66,9 +69,8 @@ export default function SignupForm() {
               <User className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
               <input
                 type="text"
-                className={`h-12 w-full rounded-md border ${
-                  errors.name ? "border-red-500" : "border-gray-600"
-                } bg-[#1f2937] pl-10 pr-4 text-white placeholder-gray-400`}
+                className={`h-12 w-full rounded-md border ${errors.name ? "border-red-500" : "border-gray-600"
+                  } bg-[#1f2937] pl-10 pr-4 text-white placeholder-gray-400`}
                 {...register("name")}
                 placeholder="Name"
               />
@@ -82,9 +84,8 @@ export default function SignupForm() {
               <Mail className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
               <input
                 type="email"
-                className={`h-12 w-full rounded-md border ${
-                  errors.email ? "border-red-500" : "border-gray-600"
-                } bg-[#1f2937] pl-10 pr-4 text-white placeholder-gray-400`}
+                className={`h-12 w-full rounded-md border ${errors.email ? "border-red-500" : "border-gray-600"
+                  } bg-[#1f2937] pl-10 pr-4 text-white placeholder-gray-400`}
                 {...register("email")}
                 placeholder="Email"
               />
@@ -98,9 +99,8 @@ export default function SignupForm() {
               <Lock className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
               <input
                 type={showPassword ? "text" : "password"}
-                className={`h-12 w-full rounded-md border ${
-                  errors.password ? "border-red-500" : "border-gray-600"
-                } bg-[#1f2937] pl-10 pr-10 text-white placeholder-gray-400`}
+                className={`h-12 w-full rounded-md border ${errors.password ? "border-red-500" : "border-gray-600"
+                  } bg-[#1f2937] pl-10 pr-10 text-white placeholder-gray-400`}
                 {...register("password")}
                 placeholder="Password"
               />
