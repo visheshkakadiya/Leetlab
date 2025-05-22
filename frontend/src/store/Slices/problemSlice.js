@@ -45,7 +45,7 @@ export const deleteProblem = createAsyncThunk("deleteProblem", async (problemId)
 export const getAllProblems = createAsyncThunk("getAllProblems", async () => {
     try {
         const response = await axiosInstance.get("/problems/get-allProblems")
-        return response.data.problems
+        return response.data.data
     } catch (error) {
         toast.error(error.response?.data?.message || "Failed to get problems")
         throw error
@@ -111,6 +111,7 @@ const problemSlice = createSlice({
             .addCase(getAllProblems.fulfilled, (state, action) => {
                 state.loading = false;
                 state.problems = action.payload;
+                console.log("problem: ", state.problems);
             })
             .addCase(getAllProblems.rejected, (state) => {
                 state.loading = false;

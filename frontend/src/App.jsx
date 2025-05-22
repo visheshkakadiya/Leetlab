@@ -9,6 +9,8 @@ import { Toaster } from 'react-hot-toast'
 import AuthLayout from './components/AuthLayout.jsx'
 import AddProblem from './page/AddProblemPage.jsx'
 import { currentUser } from './store/Slices/authSlice.js'
+import ProblemLayout from './Layout/ProblemLayout.jsx'
+import ProblemPage from './page/ProblemPage.jsx'
 
 const App = () => {
 
@@ -55,6 +57,9 @@ const App = () => {
             </AuthLayout>
           }
         />
+        <Route path='*' element={<ProblemLayout />}>
+          <Route path='problems' element={<ProblemPage />} />
+        </Route>
       </Routes>
     </div>
   )
