@@ -4,6 +4,8 @@ import storage from 'redux-persist/lib/storage';
 import { combineReducers } from '@reduxjs/toolkit';
 import authSliceReducer from './Slices/authSlice.js';
 import problemSliceReducer from './Slices/problemSlice.js';
+import playlistSliceReducer from './Slices/playlistSlice.js';
+import submissionsSliceReducer from './Slices/submissionsSlice.js';
 
 // const persistConfig = {
 //     key: 'root',
@@ -35,6 +37,8 @@ import problemSliceReducer from './Slices/problemSlice.js';
 export const store = configureStore({
     reducer: {
         auth: authSliceReducer,
-        problem: problemSliceReducer
+        problem: problemSliceReducer,
+        playlist: playlistSliceReducer,
+        submissions: submissionsSliceReducer
     }
 })

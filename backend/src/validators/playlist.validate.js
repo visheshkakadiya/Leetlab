@@ -4,9 +4,7 @@ export const createPlaylistSchema = Joi.object({
   name: Joi.string().required().messages({
     'string.empty': 'name is required',
   }),
-  description: Joi.string().required().messages({
-    'string.empty': 'description is required',
-  }),
+  description: Joi.string().max(150).optional(),
 });
 
 export const updatePlaylistSchema = Joi.object({

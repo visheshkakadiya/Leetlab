@@ -20,7 +20,7 @@ export const registerUser = createAsyncThunk("register", async (data) => {
 
     try {
         const response = await axiosInstance.post("/auth/register", formData);
-        toast.success("User registered successfully");
+        toast.success("registered");
         return response.data;
     } catch (error) {
         toast.error(error.response?.data?.message || "Registration failed");
@@ -31,7 +31,7 @@ export const registerUser = createAsyncThunk("register", async (data) => {
 export const loginUser = createAsyncThunk("login", async (data) => {
     try {
         const response = await axiosInstance.post("/auth/login", data);
-        toast.success("User logged in successfully");
+        toast.success("logged in");
         return response.data.data;
     } catch (error) {
         toast.error(error.response?.data?.message || "Login failed");
@@ -42,7 +42,7 @@ export const loginUser = createAsyncThunk("login", async (data) => {
 export const logoutUser = createAsyncThunk("logout", async () => {
     try {
         const response = await axiosInstance.post("/auth/logout");
-        toast.success("User logged out successfully");
+        toast.success("logged out");
         return response.data;
     } catch (error) {
         toast.error(error.response?.data?.message || "Logout failed");
@@ -53,7 +53,7 @@ export const logoutUser = createAsyncThunk("logout", async () => {
 export const refreshAccessToken = createAsyncThunk("refreshAccessToken", async () => {
     try {
         const response = await axiosInstance.post("/auth/refreshToken");
-        toast.success("Access token refreshed successfully");
+        toast.success("Access token refreshed");
         return response.data.data;
     } catch (error) {
         toast.error(error.response?.data?.message || "Failed to refresh access token");
@@ -91,7 +91,7 @@ export const resetPassword = createAsyncThunk("resetPassword", async ({ token, n
 const updateProfile = createAsyncThunk("updateProfile", async (data) => {
     try {
         const response = await axiosInstance.put("/auth/update-profile", data);
-        toast.success("Profile updated successfully");
+        toast.success("Profile updated");
         return response.data;
     } catch (error) {
         toast.error(error.response?.data?.message || "Failed to update account details");

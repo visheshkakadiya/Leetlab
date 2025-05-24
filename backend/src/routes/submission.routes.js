@@ -6,6 +6,6 @@ const router = express.Router();
 
 router.get('/get-all-submissions', authMiddleware, getAllSubmission);
 router.get('/get-submission/:problemId', authMiddleware, getSubmissionsForProblem);
-router.get('/get-submissions-count/:problemId', authMiddleware, totalSubmissionsForProblem);
+router.post('/get-submissions-count', authMiddleware, totalSubmissionsForProblem);
 
 export default router;

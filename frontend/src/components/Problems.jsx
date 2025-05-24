@@ -1,22 +1,24 @@
-import React, { useState, useMemo } from "react";
-import { Link } from "react-router-dom";
-import { Bookmark, PencilIcon, TrashIcon, Plus } from "lucide-react";
-import { deleteProblem } from "../store/Slices/problemSlice.js";
+import React, { useState, useMemo, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-// import AddToPlaylistModal from "./AddToPlaylist";
-// import CreatePlaylistModal from "./CreatePlaylistModal";
+import { AddToPlaylist } from "./AddToPlaylist.jsx";
+import Dropdown from "./DropDown.jsx";
+import { totalSubmissionsForProblem } from "../store/Slices/submissionsSlice.js";
 
 const ProblemsTable = ({ problems }) => {
     const dispatch = useDispatch();
-    const authUser = useSelector((state) => state.auth.user); // ✅ Added
+    const authUser = useSelector((state) => state.auth.user);
 
     const [search, setSearch] = useState("");
     const [difficulty, setDifficulty] = useState("ALL");
     const [selectedTag, setSelectedTag] = useState("ALL");
     const [currentPage, setCurrentPage] = useState(1);
-    const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-    const [isAddToPlaylistModalOpen, setIsAddToPlaylistModalOpen] = useState(false);
-    const [selectedProblemId, setSelectedProblemId] = useState(null);
+    const [hoveredRow, setHoveredRow] = useState(null);
+    const totalSubmissions = useSelector((state) => state.submissions.submissionCount);
+
+    useEffect(() => {
+        dispatch(totalSubmissionsForProblem(problems?.map((p) => p.id)));
+    }, [dispatch, problems]);
 
     const allTags = useMemo(() => {
         if (!Array.isArray(problems)) return [];
@@ -49,22 +51,10 @@ const ProblemsTable = ({ problems }) => {
         );
     }, [filteredProblems, currentPage]);
 
-    const handleDelete = async (problemId) => {
-        await dispatch(deleteProblem(problemId));
-    };
+
 
     return (
         <div className="w-full max-w-6xl mx-auto mt-10">
-            <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-bold">Problems</h2>
-                <button
-                    className="btn btn-primary gap-2"
-                    onClick={() => setIsCreateModalOpen(true)}
-                >
-                    <Plus className="w-4 h-4" />
-                    Create Playlist
-                </button>
-            </div>
 
             <div className="flex flex-wrap justify-between items-center mb-6 gap-4">
                 <input
@@ -100,81 +90,73 @@ const ProblemsTable = ({ problems }) => {
                 </select>
             </div>
 
-            <div className="overflow-x-auto rounded-xl shadow-md">
-                <table className="table table-zebra table-lg bg-base-200 text-base-content">
-                    <thead className="bg-base-300">
-                        <tr>
-                            <th>Solved</th>
-                            <th>Title</th>
-                            <th>Tags</th>
-                            <th>Difficulty</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
+            <div className="overflow-x-auto rounded-xl">
+                <table className="table table-md w-full text-sm text-left text-white p-0 ">
                     <tbody>
                         {paginatedProblems.length > 0 ? (
-                            paginatedProblems.map((problem) => {
+                            paginatedProblems.map((problem, index) => {
                                 const isSolved = Array.isArray(problem.solvedBy)
-                                    ? problem.solvedBy.some(
-                                        (user) => user.userId === authUser?.id
-                                    )
+                                    ? problem.solvedBy.some(user => user.userId === authUser?.id)
                                     : false;
 
                                 return (
-                                    <tr key={problem.id}>
-                                        <td>
-                                            <input
-                                                type="checkbox"
-                                                checked={isSolved}
-                                                readOnly
-                                                className="checkbox checkbox-sm"
-                                            />
-                                        </td>
-                                        <td>
-                                            <Link to={`/problem/${problem.id}`} className="font-semibold hover:underline">
-                                                {problem.title}
-                                            </Link>
-                                        </td>
-                                        <td>
-                                            <div className="flex flex-wrap gap-1">
-                                                {(problem.tags || []).map((tag, idx) => (
-                                                    <span
-                                                        key={idx}
-                                                        className="badge badge-outline badge-warning text-xs font-bold"
-                                                    >
-                                                        {tag}
-                                                    </span>
-                                                ))}
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <span
-                                                className={`badge font-semibold text-xs text-white ${
-                                                    problem.difficulty === "EASY"
-                                                        ? "badge-success"
-                                                        : problem.difficulty === "MEDIUM"
-                                                            ? "badge-warning"
-                                                            : "badge-error"
-                                                }`}
-                                            >
-                                                {problem.difficulty}
-                                            </span>
-                                        </td>
-                                        <td>
-                                            <div className="flex flex-col md:flex-row gap-2 items-start md:items-center">
-                                                {authUser?.role === "ADMIN" && (
-                                                    <div className="flex gap-2">
-                                                        <button
-                                                            onClick={() => handleDelete(problem.id)}
-                                                            className="btn btn-sm btn-error"
+                                    <tr
+                                        key={problem.id}
+                                        onMouseEnter={() => setHoveredRow(problem.id)}
+                                        onMouseLeave={() => setHoveredRow(null)}
+                                        className="transition-colors hover:cursor-pointer hover:bg-[#222222]"
+                                    >
+                                        <td colSpan={6} className="p-0">
+                                            <div className="flex justify-between items-center">
+                                                <div className="flex items-center gap-4 min-w-0">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={isSolved}
+                                                        readOnly
+                                                        className="checkbox checkbox-sm"
+                                                    />
+                                                    <div>
+                                                        <span className="text-sm text-gray-400 w-6">
+                                                            {index + 1 + (currentPage - 1) * itemsPerPage}.
+                                                        </span>
+                                                        <Link
+                                                            className="truncate hover:underline font-medium text-white ml-2"
+                                                            to={`/problem/${problem.id}`}
                                                         >
-                                                            <TrashIcon className="w-4 h-4 text-white" />
-                                                        </button>
-                                                        <button disabled className="btn btn-sm btn-warning">
-                                                            <PencilIcon className="w-4 h-4 text-white" />
-                                                        </button>
+                                                            {problem.title}
+                                                        </Link>
                                                     </div>
-                                                )}
+                                                </div>
+
+                                                <div className="flex items-center gap-6 shrink-0">
+                                                    <span className="relative group text-gray-300 text-sm mr-3 cursor-default">
+                                                        {totalSubmissions?.[problem.id] ?? 0}
+                                                        <span className="absolute bottom-full mb-1 left-1/2 transform -translate-x-1/2 scale-0 rounded bg-gray-700 px-2 py-1 text-xs text-white whitespace-nowrap group-hover:scale-100 transition-transform origin-bottom">
+                                                            Total submissions
+                                                        </span>
+                                                    </span>
+
+                                                    <span
+                                                        className={`text-sm ${problem.difficulty === "EASY"
+                                                            ? "text-green-400"
+                                                            : problem.difficulty === "MEDIUM"
+                                                                ? "text-yellow-400"
+                                                                : "text-red-400"
+                                                            }`}
+                                                    >
+                                                        {problem.difficulty}
+                                                    </span>
+
+                                                    <span
+                                                        className={`mt-2 transition-opacity duration-200 ${hoveredRow === problem.id ? "opacity-100" : "opacity-0"
+                                                            }`}
+                                                    >
+                                                        <AddToPlaylist problemId={problem.id} />
+                                                    </span>
+
+
+                                                    {authUser?.role === "ADMIN" && <Dropdown problemId={problem.id} />}
+                                                </div>
                                             </div>
                                         </td>
                                     </tr>
@@ -182,7 +164,7 @@ const ProblemsTable = ({ problems }) => {
                             })
                         ) : (
                             <tr>
-                                <td colSpan={5} className="text-center py-6 text-gray-500">
+                                <td colSpan={6} className="text-center py-4">
                                     No problems found.
                                 </td>
                             </tr>

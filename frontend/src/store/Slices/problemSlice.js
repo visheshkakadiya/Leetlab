@@ -9,10 +9,10 @@ const initialState = {
     solvedProblems: [],
 }
 
-export const createProblem = createAsyncThunk("createProblem", async (data) => {
+export const createProblem = createAsyncThunk("createProblem", async ({name, description}) => {
     try {
-        const response = await axiosInstance.post("/problems/create-problem", data)
-        toast.success("Problem created successfully")
+        const response = await axiosInstance.post("/problems/create-problem", {name, description})
+        toast.success("Problem created")
         return response.data
     } catch (error) {
         toast.error(error.response?.data?.message || "Failed to create problem")
@@ -23,7 +23,7 @@ export const createProblem = createAsyncThunk("createProblem", async (data) => {
 export const updateProblem = createAsyncThunk("updateProblem", async (data, problemId) => {
     try {
         const response = await axiosInstance.put(`/problems/update-problem/${problemId}`, data)
-        toast.success("Problem updated successfully")
+        toast.success("Problem updated")
         return response.data
     } catch (error) {
         toast.error(error.response?.data?.message || "Failed to update problem")
@@ -34,7 +34,7 @@ export const updateProblem = createAsyncThunk("updateProblem", async (data, prob
 export const deleteProblem = createAsyncThunk("deleteProblem", async (problemId) => {
     try {
         const response = await axiosInstance.delete(`/problems/delete-problem/${problemId}`)
-        toast.success("Problem deleted successfully")
+        toast.success("Problem deleted")
         return response.data
     } catch (error) {
         toast.error(error.response?.data?.message || "Failed to delete problem")
@@ -111,7 +111,6 @@ const problemSlice = createSlice({
             .addCase(getAllProblems.fulfilled, (state, action) => {
                 state.loading = false;
                 state.problems = action.payload;
-                console.log("problem: ", state.problems);
             })
             .addCase(getAllProblems.rejected, (state) => {
                 state.loading = false;
