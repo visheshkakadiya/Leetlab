@@ -12,7 +12,7 @@ const ProbemPage = () => {
 
   useEffect(() => {
     dispatch(getAllProblems());
-  }, [dispatch, getAllProblems]);
+  }, [dispatch]);
 
   if(loading){
     return (

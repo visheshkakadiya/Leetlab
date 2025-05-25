@@ -4,6 +4,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { AddToPlaylist } from "./AddToPlaylist.jsx";
 import Dropdown from "./DropDown.jsx";
 import { totalSubmissionsForProblem } from "../store/Slices/submissionsSlice.js";
+import { Check } from "lucide-react";
 
 const ProblemsTable = ({ problems }) => {
     const dispatch = useDispatch();
@@ -95,6 +96,7 @@ const ProblemsTable = ({ problems }) => {
                     <tbody>
                         {paginatedProblems.length > 0 ? (
                             paginatedProblems.map((problem, index) => {
+                                
                                 const isSolved = Array.isArray(problem.solvedBy)
                                     ? problem.solvedBy.some(user => user.userId === authUser?.id)
                                     : false;
@@ -104,17 +106,16 @@ const ProblemsTable = ({ problems }) => {
                                         key={problem.id}
                                         onMouseEnter={() => setHoveredRow(problem.id)}
                                         onMouseLeave={() => setHoveredRow(null)}
-                                        className="transition-colors hover:cursor-pointer hover:bg-[#222222]"
+                                        className="transition-colors hover:bg-[#222222]"
                                     >
                                         <td colSpan={6} className="p-0">
                                             <div className="flex justify-between items-center">
                                                 <div className="flex items-center gap-4 min-w-0">
-                                                    <input
-                                                        type="checkbox"
-                                                        checked={isSolved}
-                                                        readOnly
-                                                        className="checkbox checkbox-sm"
-                                                    />
+                                                    {isSolved ? <Check className="text-green-400" size={20}/>
+                                                    : (
+                                                        <div className="w-5"></div>
+                                                    )    
+                                                }
                                                     <div>
                                                         <span className="text-sm text-gray-400 w-6">
                                                             {index + 1 + (currentPage - 1) * itemsPerPage}.

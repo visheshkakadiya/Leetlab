@@ -8,6 +8,7 @@ const initialState = {
         problems: []
     },
     playlists: [],
+    isPublished: false
 }
 
 export const createPlaylist = createAsyncThunk("createPlaylist", async (data) => {
@@ -170,6 +171,10 @@ const playlistSlice = createSlice({
             })
             .addCase(getPlaylistById.fulfilled, (state, action) => {
                 state.playlist = action.payload
+            })
+            .addCase(togglePublish.fulfilled, (state, action) => {
+                state.loading = false
+                state.isPublished = !state.isPublished
             })
     }
 })

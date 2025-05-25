@@ -4,6 +4,7 @@ import {
     Library,
     Plus,
     Globe,
+    Lock
 } from 'lucide-react';
 import { CreatePlaylistModal } from './CreatePlaylist';
 import { getOwnPlaylists } from '../store/Slices/playlistSlice.js';
@@ -15,6 +16,7 @@ export const SideBar = () => {
     const navigate = useNavigate();
     const [modalOpen, setModalOpen] = useState(false);
     const playlists = useSelector((state) => state.playlist.playlists);
+    const isPublish = useSelector((state) => state.playlist.isPublished);
 
     useEffect(() => {
         dispatch(getOwnPlaylists());
@@ -52,7 +54,11 @@ export const SideBar = () => {
                             <div className="flex items-center gap-2 cursor-pointer w-full">
                                 <span><NotepadText size={20} /></span>
                                 <span className="truncate text-sm text-white flex-1">{playlist.name}</span>
-                                <Globe className="w-4 h-4 text-gray-400" />
+                                {isPublish ? (
+                                    <span><Globe size={20} /></span>
+                                ) : (
+                                    <span><Lock size={20} /></span>
+                                )}
                             </div>
                         </li>
                     ))

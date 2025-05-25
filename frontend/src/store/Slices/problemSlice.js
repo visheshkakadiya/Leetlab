@@ -99,8 +99,9 @@ const problemSlice = createSlice({
             .addCase(deleteProblem.pending, (state) => {
                 state.loading = true;
             })
-            .addCase(deleteProblem.fulfilled, (state) => {
+            .addCase(deleteProblem.fulfilled, (state, action) => {
                 state.loading = false;
+                state.problems = state.problems.filter((problem) => problem.id !== action.payload.id);
             })
             .addCase(deleteProblem.rejected, (state) => {
                 state.loading = false;

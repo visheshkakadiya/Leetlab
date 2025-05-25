@@ -520,12 +520,10 @@ const CreateProblemForm = () => {
     try {
       setIsLoading(true)
       const res = await axiosInstance.post("/problems/create-problem", value)
-      console.log(res.data);
       toast.success(res.data.message || "Problem Created successfully⚡");
-      navigation("/");
+      navigation("/problems");
 
     } catch (error) {
-      console.log(error);
       toast.error("Error creating problem")
     }
     finally {
