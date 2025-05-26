@@ -34,7 +34,7 @@ export const runReferenceCode = async (referenceSolutions, testcases) => {
 
 export const runCode = async (source_code, language_id, stdin) => {
     const submissions = stdin.map((input) => ({
-        source_code: source_code.code,
+        source_code,
         language_id,
         stdin: input,
     }))

@@ -9,6 +9,8 @@ export const validate = (schema) => (req, res, next) => {
       fieldErrors[field] = err.message;
     });
 
+    console.log(fieldErrors);
+
     return res.status(400).json({
       success: false,
       message: "Validation Failed",

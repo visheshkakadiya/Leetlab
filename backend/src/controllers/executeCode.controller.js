@@ -8,12 +8,11 @@ import { runCode } from "../libs/executeRefCode.js";
 
 const executeCode = asyncHandler(async (req, res) => {
 
-    const { source_code, language_id, stdin, expected_outputs, problemId } = req.body;
+    const { code, language_id, stdin, expected_outputs, id } = req.body;
 
     const userId = req.user.id;
 
     // 1. Validate test cases which are coming in array format
-
     if (!Array.isArray(stdin) ||
         stdin.length === 0 ||
         !Array.isArray(expected_outputs) ||
@@ -22,7 +21,11 @@ const executeCode = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Test cases are not valid");
     }
 
-    const results = await runCode(source_code, language_id, stdin);
+    const results = await runCode(code, language_id, stdin);
+
+    if (!results) {
+        throw new ApiError(500, "Failed to execute code");
+    }
 
     // Analyze test case results
     let allPassed = true;
@@ -50,8 +53,8 @@ const executeCode = asyncHandler(async (req, res) => {
     const submission = await db.submission.create({
         data: {
             userId,
-            problemId,
-            sourceCode: source_code,
+            problemId: id,
+            sourceCode: code,
             language: getLanguageName(language_id),
             stdin: stdin.join("\n"),
             stdout: JSON.stringify(detailedResults.map((r) => r.stdout)),
@@ -73,13 +76,13 @@ const executeCode = asyncHandler(async (req, res) => {
             where: {
                 userId_problemId: {
                     userId,
-                    problemId,
+                    problemId: id,
                 }
             },
             update: {},
             create: {
                 userId,
-                problemId,
+                problemId: id,
             }
         })
     }

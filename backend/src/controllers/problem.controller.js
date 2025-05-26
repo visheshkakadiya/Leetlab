@@ -23,7 +23,11 @@ const createProblem = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Problem with this title already exists")
     }
 
-    runReferenceCode(referenceSolutions, testcases)
+    const result = await runReferenceCode(referenceSolutions, testcases)
+
+    if (!result) {
+        throw new ApiError(400, "Testcases failed")
+    }
 
     // saving the problem to the Database
     const newProblem = await db.problem.create({

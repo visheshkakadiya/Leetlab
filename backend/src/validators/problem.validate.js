@@ -32,20 +32,20 @@ export const updateProblemSchema = createProblemSchema.fork(
   (schema) => schema.optional()
 );
 
-export const executeCodeSchema = Joi.object({
-  source_code: Joi.string().required().messages({
-    'string.empty': 'source_code is required',
-  }),
-  language_id: Joi.number().required().messages({
-    'any.required': 'language_id is required',
-  }),
-  stdin: Joi.array().required().messages({
-    'array.base': 'stdin is required',
-  }),
-  expected_outputs: Joi.array().required().messages({
-    'array.base': 'expected_outputs is required',
-  }),
-  problemId: Joi.string().required().messages({
-    'string.empty': 'Problem Id is required',
-  }),
-});
+// export const executeCodeSchema = Joi.object({
+//   source_code: Joi.string().required().messages({
+//     'string.empty': 'source_code is required',
+//   }),
+//   language_id: Joi.number().required().messages({
+//     'any.required': 'language_id is required',
+//   }),
+//   stdin: Joi.array().required().messages({
+//     'array.base': 'stdin is required',
+//   }),
+//   expected_outputs: Joi.array().required().messages({
+//     'array.base': 'expected_outputs is required',
+//   }),
+//   problemId: Joi.string().required().messages({
+//     'string.empty': 'Problem Id is required',
+//   }),
+// });

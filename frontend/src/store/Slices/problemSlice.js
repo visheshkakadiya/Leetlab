@@ -55,7 +55,7 @@ export const getAllProblems = createAsyncThunk("getAllProblems", async () => {
 export const getProblemById = createAsyncThunk("getProblemById", async (problemId) => {
     try {
         const response = await axiosInstance.get(`/problems/get-problem/${problemId}`)
-        return response.data.problem
+        return response.data.data
     } catch (error) {
         toast.error(error.response?.data?.message || "Failed to get problem")
         throw error

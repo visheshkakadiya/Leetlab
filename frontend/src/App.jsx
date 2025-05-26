@@ -11,6 +11,7 @@ import AddProblem from './page/AddProblemPage.jsx'
 import { currentUser } from './store/Slices/authSlice.js'
 import ProblemLayout from './Layout/ProblemLayout.jsx'
 import ProblemPage from './page/ProblemPage.jsx'
+import ProblemDetails from './page/ProblemDetails.jsx'
 
 const App = () => {
 
@@ -60,6 +61,15 @@ const App = () => {
         <Route path='*' element={<ProblemLayout />}>
           <Route path='problems' element={<ProblemPage />} />
         </Route>
+        
+        <Route 
+          path='/problem/:id'
+          element={
+            <AuthLayout authentication={true}>
+              <ProblemDetails />
+            </AuthLayout>
+          }
+        />
       </Routes>
     </div>
   )

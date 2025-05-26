@@ -6,6 +6,7 @@ import authSliceReducer from './Slices/authSlice.js';
 import problemSliceReducer from './Slices/problemSlice.js';
 import playlistSliceReducer from './Slices/playlistSlice.js';
 import submissionsSliceReducer from './Slices/submissionsSlice.js';
+import executeSliceReducer from './Slices/ExecuteSlice.js';
 
 // const persistConfig = {
 //     key: 'root',
@@ -39,6 +40,7 @@ export const store = configureStore({
         auth: authSliceReducer,
         problem: problemSliceReducer,
         playlist: playlistSliceReducer,
-        submissions: submissionsSliceReducer
+        submissions: submissionsSliceReducer,
+        execute: executeSliceReducer
     }
 })
