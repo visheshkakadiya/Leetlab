@@ -5,13 +5,25 @@ import { toast } from "react-hot-toast";
 const initialState = {
     executing: false,
     submission: null,
+    runCodeRes: null,
 }
 
-export const executeCode = createAsyncThunk("executeCode", async ({code, language_id, stdin, expected_outputs, id}) => {
+export const submitCode = createAsyncThunk("submitCode", async ({code, language_id, stdin, expected_outputs, id}) => {
     try {
-        const response = await axiosInstance.post("/execute-code", {code, language_id, stdin, expected_outputs, id});
+        const response = await axiosInstance.post("/submit", {code, language_id, stdin, expected_outputs, id});
         toast.success("Code executed")
         return response.data.data;
+    } catch (error) {
+        toast.error(error.response?.data?.message || "Failed to execute code")
+        throw error
+    }
+})
+
+export const runCode = createAsyncThunk("runCode", async ({code, language_id, stdin, expected_outputs, id}) => {
+    try {
+        const response = await axiosInstance.post("/run", {code, language_id, stdin, expected_outputs, id});
+        toast.success("Code executed")
+        return response.data;
     } catch (error) {
         toast.error(error.response?.data?.message || "Failed to execute code")
         throw error
@@ -24,14 +36,24 @@ const executeSlice = createSlice({
     reducers: {},
     extraReducers: (builder) => {
         builder
-            .addCase(executeCode.pending, (state) => {
+            .addCase(submitCode.pending, (state) => {
                 state.executing = true;
             })
-            .addCase(executeCode.fulfilled, (state, action) => {
+            .addCase(submitCode.fulfilled, (state, action) => {
                 state.executing = false;
                 state.submission = action.payload;
             })
-            .addCase(executeCode.rejected, (state) => {
+            .addCase(submitCode.rejected, (state) => {
+                state.executing = false;
+            })
+            .addCase(runCode.pending, (state) => {
+                state.executing = true;
+            })
+            .addCase(runCode.fulfilled, (state, action) => {
+                state.executing = false;
+                state.runCodeRes = action.payload;
+            })
+            .addCase(runCode.rejected, (state) => {
                 state.executing = false;
             })
     }

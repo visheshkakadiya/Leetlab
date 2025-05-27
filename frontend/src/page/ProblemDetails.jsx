@@ -1,4 +1,3 @@
-// ProblemDetails.jsx
 import React, { useState, useEffect } from "react";
 import Editor from "@monaco-editor/react";
 import {
@@ -20,9 +19,10 @@ import { Link, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { getProblemById } from "../store/Slices/problemSlice.js";
 import { getLanguageId } from "../helper/language.js";
-import { executeCode } from "../store/Slices/ExecuteSlice.js";
+import { submitCode, runCode } from "../store/Slices/ExecuteSlice.js";
 import { getSubmissionsForProblem, totalSubmissionsForProblem } from "../store/Slices/submissionsSlice.js";
 import SubmissionResults from "../components/Submission.jsx";
+import SubmissionsList from "../components/SubmissionList.jsx";
 
 const ProblemDetails = () => {
   const { id } = useParams();
@@ -31,8 +31,12 @@ const ProblemDetails = () => {
   const problem = useSelector((state) => state.problem.problem);
   const problemLoading = useSelector((state) => state.problem.loading);
   const executing = useSelector((state) => state.execute.executing);
+
+  const submissionsLoading = useSelector((state) => state.submissions?.loading);
+  const submissions = useSelector((state) => state.submissions?.submission);
+
   const submission = useSelector((state) => state.execute.submission);
- // const totalSubmission = useSelector((state) => state.submission.submissionCount);
+  // const totalSubmission = useSelector((state) => state.submissions.submissionCount);
 
   const [code, setCode] = useState("");
   const [activeTab, setActiveTab] = useState("description");
@@ -43,7 +47,7 @@ const ProblemDetails = () => {
   useEffect(() => {
     if (id) {
       dispatch(getProblemById(id));
-    //   dispatch(totalSubmissionsForProblem(id));
+    // dispatch(totalSubmissionsForProblem(id));
     }
   }, [dispatch, id]);
 
@@ -64,8 +68,6 @@ const ProblemDetails = () => {
     }
   }, [activeTab, id, dispatch]);
 
-  console.log("submission", submission);
-
   const handleLanguageChange = (e) => {
     const lang = e.target.value;
     setSelectedLanguage(lang);
@@ -78,7 +80,7 @@ const ProblemDetails = () => {
       const language_id = getLanguageId(selectedLanguage);
       const stdin = problem?.testcases?.map((tc) => tc.input) || [];
       const expected_outputs = problem?.testcases?.map((tc) => tc.output) || [];
-      dispatch(executeCode({code, language_id, stdin, expected_outputs, id}));
+      dispatch(submitCode({ code, language_id, stdin, expected_outputs, id }));
     } catch (error) {
       console.log("Error executing code", error);
     }
@@ -133,9 +135,18 @@ const ProblemDetails = () => {
           </div>
         );
       case "submissions":
-        return <div className="p-4 text-center text-base-content/70">Submissions tab is under construction.</div>;
+        return (
+          <SubmissionsList
+            submissions={submissions?.data || []}
+            isLoading={submissionsLoading}
+          />
+        );
       case "discussion":
-        return <div className="p-4 text-center text-base-content/70">No discussions yet</div>;
+        return (
+          <div className="p-4 text-center text-base-content/70">
+            No discussions yet
+          </div>
+        );
       case "hints":
         return (
           <div className="p-4">

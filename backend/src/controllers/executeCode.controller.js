@@ -6,7 +6,7 @@ import ApiResponse from "../utils/ApiResponse.js";
 import { runCode } from "../libs/executeRefCode.js";
 
 
-const executeCode = asyncHandler(async (req, res) => {
+const submitCode = asyncHandler(async (req, res) => {
 
     const { code, language_id, stdin, expected_outputs, id } = req.body;
 
@@ -120,4 +120,41 @@ const executeCode = asyncHandler(async (req, res) => {
     )
 });
 
-export { executeCode };
+const runCodeOnly = asyncHandler(async (req, res) => {
+  const { code, language_id, stdin, expected_outputs } = req.body;
+
+  if (
+    !Array.isArray(stdin) || stdin.length === 0 ||
+    !Array.isArray(expected_outputs) || expected_outputs.length !== stdin.length
+  ) {
+    throw new ApiError(400, "Test cases are not valid");
+  }
+
+  const results = await runCode(code, language_id, stdin);
+  if (!results) {
+    throw new ApiError(500, "Failed to execute code");
+  }
+
+  const detailedResults = results.map((result, i) => {
+    const stdout = result.stdout?.trim();
+    const expected_output = expected_outputs[i]?.trim();
+    const passed = stdout === expected_output;
+
+    return {
+      testCase: i + 1,
+      passed,
+      stdout,
+      expected: expected_output,
+      stderr: result.stderr || null,
+      compile_output: result.compile_output || null,
+      status: result.status.description,
+      memory: result.memory ? `${result.memory} KB` : undefined,
+      time: result.time ? `${result.time} sec` : undefined,
+    };
+  });
+
+  res.status(200).json(new ApiResponse(200, detailedResults, "Code run completed"));
+});
+
+
+export { submitCode, runCodeOnly };
