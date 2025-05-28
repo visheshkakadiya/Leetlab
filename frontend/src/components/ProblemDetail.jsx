@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, data } from 'react-router-dom';
 import {
     ChevronLeft,
     Users,
@@ -11,7 +11,10 @@ import {
     Minimize,
     Code2,
     Maximize2,
-    RotateCcw
+    RotateCcw,
+    Play,
+    Loader2,
+    Dot
 } from "lucide-react";
 import Editor from '@monaco-editor/react';
 import { getProblemById } from "../store/Slices/problemSlice.js";
@@ -20,19 +23,23 @@ import { submitCode, runCode } from "../store/Slices/ExecuteSlice.js";
 import { getSubmissionsForProblem, totalSubmissionsForProblem } from "../store/Slices/submissionsSlice.js";
 import SubmissionResults from "../components/Submission.jsx";
 import SubmissionsList from "../components/SubmissionList.jsx";
+import { useNavigate } from 'react-router-dom';
 
 export const ProblemDetail = () => {
-
     const { id } = useParams();
     const dispatch = useDispatch();
+    const navigate = useNavigate();
 
     const problem = useSelector((state) => state.problem?.problem);
-    console.log("problem", problem);
     const problemLoading = useSelector((state) => state.problem.loading);
 
-    const executing = useSelector((state) => state.execute.executing);
+    const submitting = useSelector((state) => state.execute.executing);
+    const running = useSelector((state) => state.execute.running);
     const submission = useSelector((state) => state.execute.submission);
-    const runCode = useSelector((state) => state.execute.runCodeRes);
+    const runCodeRes = useSelector((state) => state.execute.runCodeRes);
+
+    const timeArr = runCodeRes?.data?.map((res) => res.time || []);
+    const avgTime = timeArr?.length > 0 ? timeArr.map((t) => parseFloat(t)).reduce((a, b) => a + b, 0) / timeArr.length : 0;
 
     const submissionsLoading = useSelector((state) => state.submissions?.loading);
     const submissions = useSelector((state) => state.submissions?.submission);
@@ -45,7 +52,8 @@ export const ProblemDetail = () => {
 
     const [isFullscreen, setIsFullscreen] = useState(false);
     const [isHovered, setIsHovered] = useState(false);
-
+    const [activeCase, setActiveCase] = useState(0);
+    const [testTab, setTestTab] = useState("testCase");
 
     useEffect(() => {
         if (id) {
@@ -55,14 +63,28 @@ export const ProblemDetail = () => {
 
     useEffect(() => {
         if (problem) {
+            const availableLanguages = Object.keys(problem.codeSnippets || {});
+            let languageToUse = selectedLanguage;
+
+            if (!availableLanguages.includes(selectedLanguage) && availableLanguages.length > 0) {
+                languageToUse = availableLanguages.includes('javascript') ? 'javascript' : availableLanguages[0];
+                setSelectedLanguage(languageToUse);
+            }
+
             setCode(
-                problem.codeSnippets?.[selectedLanguage] || submission?.sourceCode || ""
+                problem.codeSnippets?.[languageToUse] || submission?.sourceCode || ""
             );
             setTestCases(
                 problem.testcases?.map((tc) => ({ input: tc.input, output: tc.output })) || []
             );
         }
-    }, [problem, selectedLanguage]);
+    }, [problem]); 
+
+    useEffect(() => {
+        if (problem && problem.codeSnippets) {
+            setCode(problem.codeSnippets[selectedLanguage] || "");
+        }
+    }, [selectedLanguage, problem?.codeSnippets]);
 
     useEffect(() => {
         if (activeTab === "submissions" && id) {
@@ -76,6 +98,28 @@ export const ProblemDetail = () => {
         setCode(problem?.codeSnippets?.[lang] || "");
     };
 
+    const handleCodeRun = async () => {
+        const language_id = getLanguageId(selectedLanguage);
+        const stdin = problem?.testcases?.map((tc) => tc.input);
+        const expected_outputs = problem?.testcases?.map((tc) => tc.output);
+        await dispatch(runCode({ code, language_id, stdin, expected_outputs, id }));
+        setTestTab("testCaseResult");
+    }
+
+    const handleSubmitCode = (e) => {
+        e.preventDefault();
+        try {
+            const language_id = getLanguageId(selectedLanguage);
+            const stdin = problem?.testcases?.map((tc) => tc.input) || [];
+            const expected_outputs = problem?.testcases?.map((tc) => tc.output) || [];
+            dispatch(submitCode({ code, language_id, stdin, expected_outputs, id }));
+        } catch (error) {
+            console.log("Error executing code", error);
+        }
+    };
+
+    if (problemLoading) return <Loader2 className="animate-spin" />
+
     const renderTabContent = () => {
         switch (activeTab) {
             case "description":
@@ -83,10 +127,8 @@ export const ProblemDetail = () => {
                     <div className="text-sm text-gray-300 leading-relaxed">
                         <div className="mb-6">
                             <p className="mb-4">{problem?.description}</p>
-                            {/* <p className="text-gray-400 italic">{note}</p> */}
                         </div>
                         <div className="space-y-4">
-
                             {problem?.examples && Object.entries(problem.examples).map(([lang, example], index) => (
                                 <div key={lang} className="bg-[#353839] rounded-lg p-4 space-y-3">
                                     <div className="font-semibold text-white mb-2">Example {index + 1} :</div>
@@ -94,7 +136,6 @@ export const ProblemDetail = () => {
                                         <div><span className="text-blue-400">Input:</span> {example.input}</div>
                                         <div><span className="text-green-400">Output:</span> {example.output}</div>
                                     </div>
-
                                     {example.explanation && (
                                         <div>
                                             <div className="font-semibold text-white mb-2">Explanation:</div>
@@ -123,13 +164,120 @@ export const ProblemDetail = () => {
         }
     };
 
+    const renderCaseContent = () => {
+        switch (testTab) {
+            case "testCase":
+                return (
+                    <>
+                        <div className="flex space-x-2 mb-4">
+                            {testcases.map((_, idx) => (
+                                <button
+                                    key={idx}
+                                    onClick={() => setActiveCase(idx)}
+                                    className={`px-3 py-1 rounded font-medium text-sm ${activeCase === idx
+                                        ? "bg-white/10 text-white"
+                                        : "text-gray-400 hover:bg-white/10"
+                                        }`}
+                                >
+                                    Case {idx + 1}
+                                </button>
+                            ))}
+                        </div>
+
+                        {testcases[activeCase] && (
+                            <div className="space-y-2 text-sm font-mono text-white">
+                                <div className='bg-[#353839] rounded-lg p-3'>
+                                    <span className="text-white/70">Input:</span>{" "}
+                                    {testcases[activeCase].input}
+                                </div>
+                                <div className='bg-[#353839] rounded-lg p-3'>
+                                    <span className="text-white/70">Expected Output:</span>{" "}
+                                    {testcases[activeCase].output}
+                                </div>
+                            </div>
+                        )}
+                    </>
+                );
+            case "testCaseResult":
+                return (
+                    <>
+                        {runCodeRes && Object.keys(runCodeRes).length > 0 ? (
+                            <>
+                                <div className="mb-0 p-2 pt-0 rounded-lg ">
+                                    <div className={`text-xl font-bold mb-2 ${runCodeRes?.data[activeCase]?.passed === true ? 'text-green-400' : 'text-red-400'}`}>
+                                        {runCodeRes?.data[activeCase]?.passed ? (
+                                            <>
+                                                Accepted <span className="text-white/80 text-sm ml-2 font-light">Runtime: {avgTime.toFixed(3)} ms</span>
+                                            </>
+                                        ) : (
+                                            <>Wrong Answer</>
+                                        )}
+                                    </div>
+                                </div>
+
+                                <div className="flex space-x-2 mb-4">
+                                    {testcases.map((_, idx) => (
+                                        <button
+                                            key={idx}
+                                            onClick={() => setActiveCase(idx)}
+                                            className={`px-3 py-1 rounded font-medium text-sm flex items-center gap-2 ${activeCase === idx
+                                                ? "bg-white/10 text-white"
+                                                : "text-gray-400 hover:bg-white/10"
+                                                }`}
+                                        >
+                                            {runCodeRes?.data[idx]?.passed === true ? (
+                                                <Dot size={20} className="text-green-400" />
+                                            ) : (
+                                                <Dot size={20} className="text-red-400" />
+                                            )}
+                                            Case {idx + 1}
+                                        </button>
+
+                                    ))}
+                                </div>
+
+                                {testcases[activeCase] && (
+                                    <div className="space-y-3 text-sm font-mono text-white">
+                                        <div className='bg-white/5 rounded-lg p-3 border border-gray-700'>
+                                            <div className="text-gray-300 font-medium mb-2">Input:</div>
+                                            <div className="text-white p-0 rounded">{testcases[activeCase].input}</div>
+                                        </div>
+                                        <div className='bg-white/5 rounded-lg p-3 border border-gray-700'>
+                                            <div className="text-gray-300 font-medium mb-2">Output:</div>
+                                            {runCodeRes?.data[activeCase]?.stderr ? (
+                                                <div className="text-red-500 p-0 rounded">{runCodeRes?.data[activeCase]?.stderr}</div>
+                                            ) : (
+                                                <div className="text-white p-0 rounded">{runCodeRes?.data[activeCase]?.stdout}</div>
+                                            )}
+                                        </div>
+                                        <div className='bg-white/5 rounded-lg p-3 border border-gray-700'>
+                                            <div className="text-gray-300 font-medium mb-2">Expected Output:</div>
+                                            <div className="text-white p-0 rounded">{testcases[activeCase].output}</div>
+                                        </div>
+                                    </div>
+                                )}
+                            </>
+                        ) : (
+                            <div className="text-center text-gray-400 py-12">
+                                <div className="text-lg mb-2">No test results yet</div>
+                                <div className="text-sm">Run your code to see the results</div>
+                            </div>
+                        )}
+                    </>
+                );
+            default:
+                return null;
+        }
+    };
+
+    // Main component return - this was missing!
     return (
         <div className='h-screen bg-[#222222] text-white flex flex-col w-full'>
             <div className="bg-[#222222] border-b border-gray-700 px-2 py-2 flex items-center justify-between">
                 <div className="flex items-center space-x-4">
-                    <div className="flex items-center space-x-2">
+                    <div className="flex items-center space-x-2" onClick={() => navigate("/problems")}>
                         <ChevronLeft className="w-5 h-5 text-gray-400 cursor-pointer hover:text-white" />
-                        <span className="text-sm text-gray-400">Problem List</span>
+                        <span className="text-sm text-gray-400 hover:text-white hover:cursor-pointer">Problem List</span>
                     </div>
                     <div className="w-px h-6 bg-gray-600"></div>
                     <div className="flex items-center space-x-2">
@@ -137,14 +285,45 @@ export const ProblemDetail = () => {
                     </div>
                 </div>
 
-                <button className="bg-green-600 hover:bg-green-700 px-3 py-2 rounded text-sm font-medium flex gap-2">
-                    <CloudUpload size={20} />
-                    Submit
-                </button>
+                <div className='flex flex-row gap-2'>
+                    <button className="bg-blue-600 hover:bg-blue-700 px-3 py-2 rounded text-sm font-medium flex gap-2"
+                        onClick={handleCodeRun}
+                    >
+                        {running ? (
+                            <>
+                                <Loader2 size={20} className="animate-spin" /> Running
+                            </>
+                        ) : (
+                            <>
+                                <Play size={20} />
+                                Run
+                            </>
+                        )}
+                    </button>
+                    <button className="bg-green-600 hover:bg-green-700 px-3 py-2 rounded text-sm font-medium flex gap-2"
+                        onClick={handleSubmitCode}
+                    >
+                        {submitting ? (
+                            <>
+                                <Loader2 size={20} className="animate-spin" /> Compiling
+                            </>
+                        ) : (
+                            <>
+                                <CloudUpload size={20} />
+                                Submit
+                            </>
+                        )}
+                    </button>
+                </div>
 
                 <div className="flex items-center space-x-4">
                     <div className="flex items-center space-x-2 text-sm text-gray-400">
-                        <span className="bg-yellow-600 text-white px-2 py-1 rounded text-xs">{problem?.difficulty}</span>
+                        <span className={`text-sm ${problem?.difficulty === "EASY"
+                            ? "text-green-400"
+                            : problem?.difficulty === "MEDIUM"
+                                ? "text-yellow-400"
+                                : "text-red-400"
+                            }`}>{problem?.difficulty}</span>
                         <Users className="w-4 h-4" />
                         <span>14.1K</span>
                         <MessageSquare className="w-4 h-4" />
@@ -161,12 +340,10 @@ export const ProblemDetail = () => {
                 {/* Left Panel - Problem Description */}
                 <div
                     className={`${isFullscreen ? "absolute top-0 left-0 w-full h-full z-50 bg-[#222222]" : "ml-2 mb-2 w-1/2"} 
-                                    border border-gray-700 rounded-xl overflow-hidden flex flex-col transition-all duration-300`}
+                                border border-gray-700 rounded-xl overflow-hidden flex flex-col transition-all duration-300`}
                     onMouseEnter={() => setIsHovered(true)}
                     onMouseLeave={() => setIsHovered(false)}
                 >
-
-
                     <div className="bg-[#222222] border-b border-gray-700 flex items-center justify-between flex-shrink-0 rounded-t-xl px-2">
                         {/* Tabs */}
                         <div className="flex">
@@ -210,17 +387,16 @@ export const ProblemDetail = () => {
                         </div>
                     </div>
 
-
                     {/* Tab Content */}
                     <div className="flex-1 overflow-y-auto p-6">
                         {renderTabContent()}
                     </div>
                 </div>
 
-                {/* Right Panel - Submission List */}
+                {/* Right Panel */}
                 {!isFullscreen && (
-                    <div className='w-1/2 rounded-xl overflow-y-auto'>
-                        <div className="bg-[#222222] border border-gray-700 flex items-center justify-between px-4 py-2">
+                    <div className='w-1/2 flex flex-col h-full'>
+                        <div className="bg-[#222222] border border-gray-700 rounded-t-lg flex items-center justify-between px-4 py-2 flex-shrink-0">
                             <div className="flex items-center space-x-4">
                                 <div className="flex items-center space-x-2">
                                     <Code2 className="w-4 h-4" />
@@ -231,10 +407,9 @@ export const ProblemDetail = () => {
                                 </div>
                             </div>
 
-                            {/* Controls */}
                             <div className="flex items-center space-x-2">
                                 <select
-                                    className="bg-gray-700 border border-gray-600 rounded px-3 py-1 text-sm text-white"
+                                    className="bg-[#222222] text-white border border-gray-700 rounded px-3 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
                                     value={selectedLanguage}
                                     onChange={handleLanguageChange}
                                 >
@@ -245,10 +420,11 @@ export const ProblemDetail = () => {
                                     ))}
                                 </select>
 
-                                <button className="p-1 hover:bg-gray-700 rounded text-white">
-                                    <RotateCcw className="w-4 h-4"
-                                        onClick={() => setCode(problem.codeSnippets?.[selectedLanguage] || submission?.sourceCode || "")}
-                                    />
+                                <button
+                                    className="p-1 hover:bg-gray-700 rounded text-white"
+                                    onClick={() => setCode(problem?.codeSnippets?.[selectedLanguage] || submission?.sourceCode || "")}
+                                >
+                                    <RotateCcw className="w-4 h-4" />
                                 </button>
                                 <button className="p-1 hover:bg-gray-700 rounded text-white">
                                     <Maximize2 className="w-4 h-4" />
@@ -257,26 +433,51 @@ export const ProblemDetail = () => {
                         </div>
 
                         {/* Editor Panel */}
-                        <div className="flex-1 bg-gray-900 relative h-[500px]">
-                            <div className="absolute inset-0 font-mono text-sm">
-                                <div className="h-full flex">
-                                    {/* Code Textarea */}
-                                    <Editor
-                                        height="100%"
-                                        language={selectedLanguage.toLowerCase()}
-                                        theme="vs-dark"
-                                        value={code}
-                                        onChange={(value) => setCode(value || "")}
-                                        options={{
-                                            minimap: { enabled: false },
-                                            fontSize: 15,
-                                            lineNumbers: "on",
-                                            roundedSelection: false,
-                                            scrollBeyondLastLine: false,
-                                            readOnly: false,
-                                            automaticLayout: true,
-                                        }}
-                                    />
+                        <div className="flex flex-col bg-[#222222] relative font-mono text-sm overflow-hidden gap-1 h-full">
+                            {/* Code Editor */}
+                            <div className="h-[60%] border border-gray-700 rounded-lg overflow-hidden">
+                                <Editor
+                                    height="100%"
+                                    language={selectedLanguage.toLowerCase()}
+                                    theme="vs-dark"
+                                    value={code}
+                                    onChange={(value) => setCode(value || "")}
+                                    options={{
+                                        minimap: { enabled: false },
+                                        fontSize: 15,
+                                        lineNumbers: "on",
+                                        roundedSelection: false,
+                                        scrollBeyondLastLine: false,
+                                        readOnly: false,
+                                        automaticLayout: true,
+                                    }}
+                                />
+                            </div>
+
+                            {/* Test Case Panel */}
+                            <div className="h-[40%] bg-[#2d2d2d] border border-gray-700 rounded-lg flex flex-col overflow-hidden">
+                                <div className="flex-shrink-0 bg-[#2d2d2d] border-b border-gray-600">
+                                    <div className="flex">
+                                        {[
+                                            ["testCase", "Testcase"],
+                                            ["testCaseResult", "Test Result"],
+                                        ].map(([key, label]) => (
+                                            <button
+                                                key={key}
+                                                className={`px-4 py-2 text-sm font-medium transition-colors border-b-2 ${testTab === key
+                                                    ? "border-orange-500 text-white bg-[#2d2d2d]"
+                                                    : "border-transparent text-gray-400 hover:text-white hover:bg-white/10"
+                                                    }`}
+                                                onClick={() => setTestTab(key)}
+                                            >
+                                                {label}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                <div className="flex-1 overflow-y-auto p-3">
+                                    {renderCaseContent()}
                                 </div>
                             </div>
                         </div>
@@ -284,5 +485,5 @@ export const ProblemDetail = () => {
                 )}
             </div>
         </div>
-    )
-}
+    );
+};

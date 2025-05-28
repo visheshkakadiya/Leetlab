@@ -6,11 +6,12 @@ const initialState = {
     executing: false,
     submission: null,
     runCodeRes: null,
+    running: false
 }
 
 export const submitCode = createAsyncThunk("submitCode", async ({code, language_id, stdin, expected_outputs, id}) => {
     try {
-        const response = await axiosInstance.post("/submit", {code, language_id, stdin, expected_outputs, id});
+        const response = await axiosInstance.post("/execute-code/submit", {code, language_id, stdin, expected_outputs, id});
         toast.success("Code executed")
         return response.data.data;
     } catch (error) {
@@ -21,8 +22,7 @@ export const submitCode = createAsyncThunk("submitCode", async ({code, language_
 
 export const runCode = createAsyncThunk("runCode", async ({code, language_id, stdin, expected_outputs, id}) => {
     try {
-        const response = await axiosInstance.post("/run", {code, language_id, stdin, expected_outputs, id});
-        toast.success("Code executed")
+        const response = await axiosInstance.post("/execute-code/run", {code, language_id, stdin, expected_outputs, id});
         return response.data;
     } catch (error) {
         toast.error(error.response?.data?.message || "Failed to execute code")
@@ -47,14 +47,14 @@ const executeSlice = createSlice({
                 state.executing = false;
             })
             .addCase(runCode.pending, (state) => {
-                state.executing = true;
+                state.running = true;
             })
             .addCase(runCode.fulfilled, (state, action) => {
-                state.executing = false;
+                state.running = false;
                 state.runCodeRes = action.payload;
             })
             .addCase(runCode.rejected, (state) => {
-                state.executing = false;
+                state.running = false;
             })
     }
 })
