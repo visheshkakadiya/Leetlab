@@ -61,7 +61,7 @@ export const CreatePlaylistModal = ({ isOpen, onClose }) => {
                             className="mt-1 w-full px-3 py-2 bg-zinc-800 text-white border border-zinc-700 rounded-md resize-none h-20 focus:outline-none focus:ring-2 focus:ring-blue-500"
                             {...register('description')}
                         />
-                        {errors.description && <p className="text-red-500 text-xs mt-1">description is required</p>}
+                        {errors.description && <p className="text-red-500 text-xs mt-1">{errors.description.message}</p>}
                         <p className="text-xs text-gray-500 mt-1">{watchDescription.length}/150</p>
                     </div>
 

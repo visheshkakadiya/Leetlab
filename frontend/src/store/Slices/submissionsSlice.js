@@ -6,6 +6,7 @@ const initialState = {
     loading: false,
     submissions: [],
     submission: [],
+    submissionIdData: null,
     submissionCount: 0
 }
 
@@ -39,6 +40,16 @@ export const totalSubmissionsForProblem = createAsyncThunk("totalSubmissionsForP
     }
 })
 
+export const getSubmissionById = createAsyncThunk("getSubmissionById", async (submissionId) => {
+    try {
+        const response = await axiosInstance.get(`/submission/get-submission-details/${submissionId}`)
+        return response.data.data;
+    } catch (error) {
+        toast.error(error.response?.data?.message || "No Submissions found")
+        throw error
+    }
+})
+
 const submissionsSlice = createSlice({
     name: "submissions",
     initialState,
@@ -65,6 +76,13 @@ const submissionsSlice = createSlice({
             .addCase(totalSubmissionsForProblem.fulfilled, (state, action) => {
                 state.loading = false;
                 state.submissionCount = action.payload;
+            })
+            .addCase(getSubmissionById.pending, (state) => {
+                state.loading = true;
+            })
+            .addCase(getSubmissionById.fulfilled, (state, action) => {
+                state.loading = false;
+                state.submissionIdData = action.payload;
             })
     }
 })

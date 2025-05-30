@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useParams, Link, data } from 'react-router-dom';
 import {
@@ -14,16 +14,40 @@ import {
     RotateCcw,
     Play,
     Loader2,
-    Dot
+    Dot,
+    X
 } from "lucide-react";
 import Editor from '@monaco-editor/react';
 import { getProblemById } from "../store/Slices/problemSlice.js";
 import { getLanguageId } from "../helper/language.js";
 import { submitCode, runCode } from "../store/Slices/ExecuteSlice.js";
-import { getSubmissionsForProblem, totalSubmissionsForProblem } from "../store/Slices/submissionsSlice.js";
-import SubmissionResults from "../components/Submission.jsx";
+import { getSubmissionsForProblem, getSubmissionById } from "../store/Slices/submissionsSlice.js";
+import { Submission } from "../components/Submission.jsx";
 import SubmissionsList from "../components/SubmissionList.jsx";
 import { useNavigate } from 'react-router-dom';
+
+// Extract CodeEditor as a separate memoized component
+const CodeEditor = React.memo(({ code, setCode, selectedLanguage }) => {
+    return (
+        <Editor
+            height="100%"
+            language={selectedLanguage.toLowerCase()}
+            theme="vs-dark"
+            value={code}
+            onChange={(value) => setCode(value || "")}
+            options={{
+                minimap: { enabled: false },
+                fontSize: 15,
+                lineNumbers: "on",
+                roundedSelection: false,
+                scrollBeyondLastLine: false,
+                readOnly: false,
+                automaticLayout: true,
+            }}
+        />
+    );
+});
+CodeEditor.displayName = 'CodeEditor';
 
 export const ProblemDetail = () => {
     const { id } = useParams();
@@ -43,17 +67,19 @@ export const ProblemDetail = () => {
 
     const submissionsLoading = useSelector((state) => state.submissions?.loading);
     const submissions = useSelector((state) => state.submissions?.submission);
+    const submissionIdData = useSelector((state) => state.submissions?.submissionIdData);
 
     const [code, setCode] = useState("");
     const [activeTab, setActiveTab] = useState("description");
     const [selectedLanguage, setSelectedLanguage] = useState("javascript");
-    const [isBookmarked, setIsBookmarked] = useState(false);
     const [testcases, setTestCases] = useState([]);
+    const [submissionId, setSubmissionId] = useState(null);
 
     const [isFullscreen, setIsFullscreen] = useState(false);
     const [isHovered, setIsHovered] = useState(false);
     const [activeCase, setActiveCase] = useState(0);
     const [testTab, setTestTab] = useState("testCase");
+    const [editorialTab, setEditorialTab] = useState("editorial");
 
     useEffect(() => {
         if (id) {
@@ -78,7 +104,7 @@ export const ProblemDetail = () => {
                 problem.testcases?.map((tc) => ({ input: tc.input, output: tc.output })) || []
             );
         }
-    }, [problem]); 
+    }, [problem]);
 
     useEffect(() => {
         if (problem && problem.codeSnippets) {
@@ -91,6 +117,13 @@ export const ProblemDetail = () => {
             dispatch(getSubmissionsForProblem(id));
         }
     }, [activeTab, id, dispatch]);
+
+    useEffect(() => {
+        if (submissionId) {
+            dispatch(getSubmissionById(submissionId));
+            setEditorialTab("Accepted");
+        }
+    }, [submissionId, dispatch]);
 
     const handleLanguageChange = (e) => {
         const lang = e.target.value;
@@ -118,13 +151,22 @@ export const ProblemDetail = () => {
         }
     };
 
+    // Memoize the editor component to prevent unnecessary re-renders
+    const memoizedCodeEditor = useMemo(() => (
+        <CodeEditor
+            code={code}
+            setCode={setCode}
+            selectedLanguage={selectedLanguage}
+        />
+    ), [code, selectedLanguage]);
+
     if (problemLoading) return <Loader2 className="animate-spin" />
 
     const renderTabContent = () => {
         switch (activeTab) {
             case "description":
                 return (
-                    <div className="text-sm text-gray-300 leading-relaxed">
+                    <div className="text-sm text-gray-300 leading-relaxed p-4">
                         <div className="mb-6">
                             <p className="mb-4">{problem?.description}</p>
                         </div>
@@ -154,11 +196,17 @@ export const ProblemDetail = () => {
                     </div>
                 );
             case "editorial":
-                return <div className="text-center text-gray-400 py-8">Editorial content would go here</div>;
+                return <div className="text-center text-gray-400 py-8">Editorial is under development</div>;
             case "solutions":
-                return <div className="text-center text-gray-400 py-8">Community solutions would go here</div>;
+                return <div className="text-center text-gray-400 py-8">Community is under development</div>;
             case "submissions":
-                return <div className="text-center text-gray-400 py-8">Your submissions would go here</div>;
+                return (
+                    <SubmissionsList
+                        submissions={submissions.data}
+                        isLoading={submissionsLoading}
+                        submissionId={setSubmissionId}
+                    />
+                )
             default:
                 return null;
         }
@@ -207,7 +255,7 @@ export const ProblemDetail = () => {
                                     <div className={`text-xl font-bold mb-2 ${runCodeRes?.data[activeCase]?.passed === true ? 'text-green-400' : 'text-red-400'}`}>
                                         {runCodeRes?.data[activeCase]?.passed ? (
                                             <>
-                                                Accepted <span className="text-white/80 text-sm ml-2 font-light">Runtime: {avgTime.toFixed(3)} ms</span>
+                                                Accepted <span className="text-white/80 text-sm ml-2 font-light">Runtime: {avgTime.toFixed(3)} s</span>
                                             </>
                                         ) : (
                                             <>Wrong Answer</>
@@ -244,8 +292,8 @@ export const ProblemDetail = () => {
                                         </div>
                                         <div className='bg-white/5 rounded-lg p-3 border border-gray-700'>
                                             <div className="text-gray-300 font-medium mb-2">Output:</div>
-                                            {runCodeRes?.data[activeCase]?.stderr ? (
-                                                <div className="text-red-500 p-0 rounded">{runCodeRes?.data[activeCase]?.stderr}</div>
+                                            {runCodeRes?.data[activeCase]?.stderr || runCodeRes?.data[activeCase]?.compile_output ? (
+                                                <div className="text-red-500 p-0 rounded">{runCodeRes?.data[activeCase]?.stderr || runCodeRes?.data[activeCase]?.compile_output}</div>
                                             ) : (
                                                 <div className="text-white p-0 rounded">{runCodeRes?.data[activeCase]?.stdout}</div>
                                             )}
@@ -270,7 +318,7 @@ export const ProblemDetail = () => {
         }
     };
 
-    // Main component return - this was missing!
+    // Main component return
     return (
         <div className='h-screen bg-[#222222] text-white flex flex-col w-full'>
             <div className="bg-[#222222] border-b border-gray-700 px-2 py-2 flex items-center justify-between">
@@ -357,7 +405,7 @@ export const ProblemDetail = () => {
                                     key={key}
                                     className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${activeTab === key
                                         ? "border-orange-500 text-white bg-[#222222]"
-                                        : "border-transparent text-gray-400 hover:text-white hover:bg-gray-700"
+                                        : "border-transparent text-gray-400 hover:text-white hover:bg-white/10"
                                         }`}
                                     onClick={() => setActiveTab(key)}
                                 >
@@ -388,7 +436,7 @@ export const ProblemDetail = () => {
                     </div>
 
                     {/* Tab Content */}
-                    <div className="flex-1 overflow-y-auto p-6">
+                    <div className="flex-1 overflow-y-auto p-0">
                         {renderTabContent()}
                     </div>
                 </div>
@@ -398,13 +446,33 @@ export const ProblemDetail = () => {
                     <div className='w-1/2 flex flex-col h-full'>
                         <div className="bg-[#222222] border border-gray-700 rounded-t-lg flex items-center justify-between px-4 py-2 flex-shrink-0">
                             <div className="flex items-center space-x-4">
-                                <div className="flex items-center space-x-2">
-                                    <Code2 className="w-4 h-4" />
-                                    <span className="text-sm font-medium">Code</span>
-                                </div>
-                                <div className="flex items-center space-x-2 text-sm text-gray-400">
-                                    <span>Accepted</span>
-                                </div>
+                                {[
+                                    ["editorial", "Code"],
+                                    ...(submissionId ? [["Accepted", "Submission"]] : []),
+                                ].map(([Key, label]) => (
+                                    <button
+                                        key={Key}
+                                        className={`flex px-4 py-2 text-sm font-medium border-b-2 transition-colors ${editorialTab === Key
+                                            ? "border-orange-500 text-white bg-[#222222]"
+                                            : "border-transparent text-gray-400 hover:text-white hover:bg-white/10"
+                                            }`}
+                                        onClick={() => setEditorialTab(Key)}
+                                    >
+                                        {label}
+                                        {Key === "Accepted" && editorialTab === "Accepted" && (
+                                            <span
+                                                onClick={(e) => {
+                                                    e.stopPropagation(); 
+                                                    setSubmissionId(null);
+                                                    setEditorialTab("editorial");
+                                                }}
+                                                className="ml-1 text-gray-400 hover:text-white text-xs cursor-pointer"
+                                            >
+                                                <X size={15} className='mt-1 ml-1 hover:bg-white/10'/>
+                                            </span>
+                                        )}
+                                    </button>
+                                ))}
                             </div>
 
                             <div className="flex items-center space-x-2">
@@ -421,12 +489,12 @@ export const ProblemDetail = () => {
                                 </select>
 
                                 <button
-                                    className="p-1 hover:bg-gray-700 rounded text-white"
+                                    className="p-1 hover:bg-white/10 rounded text-white"
                                     onClick={() => setCode(problem?.codeSnippets?.[selectedLanguage] || submission?.sourceCode || "")}
                                 >
                                     <RotateCcw className="w-4 h-4" />
                                 </button>
-                                <button className="p-1 hover:bg-gray-700 rounded text-white">
+                                <button className="p-1 hover:bg-white/10 rounded text-white">
                                     <Maximize2 className="w-4 h-4" />
                                 </button>
                             </div>
@@ -434,24 +502,15 @@ export const ProblemDetail = () => {
 
                         {/* Editor Panel */}
                         <div className="flex flex-col bg-[#222222] relative font-mono text-sm overflow-hidden gap-1 h-full">
-                            {/* Code Editor */}
+                            {/* Code Editor Area */}
                             <div className="h-[60%] border border-gray-700 rounded-lg overflow-hidden">
-                                <Editor
-                                    height="100%"
-                                    language={selectedLanguage.toLowerCase()}
-                                    theme="vs-dark"
-                                    value={code}
-                                    onChange={(value) => setCode(value || "")}
-                                    options={{
-                                        minimap: { enabled: false },
-                                        fontSize: 15,
-                                        lineNumbers: "on",
-                                        roundedSelection: false,
-                                        scrollBeyondLastLine: false,
-                                        readOnly: false,
-                                        automaticLayout: true,
-                                    }}
-                                />
+                                {editorialTab === "editorial" ? (
+                                    memoizedCodeEditor
+                                ) : editorialTab === "Accepted" && submissionId ? (
+                                    <Submission submission={submissionIdData} />
+                                ) : (
+                                    memoizedCodeEditor
+                                )}
                             </div>
 
                             {/* Test Case Panel */}

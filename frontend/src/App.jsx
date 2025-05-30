@@ -13,7 +13,7 @@ import ProblemLayout from './Layout/ProblemLayout.jsx'
 import ProblemPage from './page/ProblemPage.jsx'
 import ProblemDetails from './page/ProblemDetails.jsx'
 import { ProblemDetail } from './components/ProblemDetail.jsx'
-import { ProblemExecution } from './components/ProblemExecution.jsx'
+import { Testing } from './components/Testing.jsx'
 
 const App = () => {
 
@@ -60,20 +60,15 @@ const App = () => {
             </AuthLayout>
           }
         />
-        <Route path='*' element={<ProblemLayout />}>
-          <Route path='problems' element={<ProblemPage />} />
+        <Route path='/problems' element={<ProblemLayout />}>
+          <Route path='' element={<ProblemPage />} />
         </Route>
 
-        {/* <Route
-          path='/testing'
-          element={<ProblemDetail />}
-        /> */}
-
         <Route 
-          path='testing2'
-          element={<ProblemExecution />}
+          path='/testing'
+          element={<Testing />}
         />
-        
+
         <Route 
           path='/problem/:id'
           element={

@@ -92,8 +92,40 @@ const totalSubmissionsForProblem = asyncHandler(async (req, res) => {
     );
 });
 
+const getSubmissionById = asyncHandler(async (req, res) => {
+
+    const { submissionId } = req.params;
+
+    const submission = await db.submission.findUnique({
+        where: {
+            id: submissionId,
+        },
+        include: {
+            user: {
+                select: {
+                    id: true,
+                    name: true,
+                }
+            },
+            testCases: {
+                select: {
+                    testCase: true,
+                }
+            }
+        }
+    })
+
+    if (!submission) {
+        throw new ApiError(404, "Submission not found");
+    }
+    res.status(200).json(
+        new ApiResponse(200, submission, "Submission fetched successfully")
+    )
+})
+
 export {
     getAllSubmission,
     getSubmissionsForProblem,
-    totalSubmissionsForProblem
+    totalSubmissionsForProblem,
+    getSubmissionById
 }

@@ -21,7 +21,7 @@ import { getProblemById } from "../store/Slices/problemSlice.js";
 import { getLanguageId } from "../helper/language.js";
 import { submitCode, runCode } from "../store/Slices/ExecuteSlice.js";
 import { getSubmissionsForProblem, totalSubmissionsForProblem } from "../store/Slices/submissionsSlice.js";
-import SubmissionResults from "../components/Submission.jsx";
+import {Submission} from "../components/Submission.jsx";
 import SubmissionsList from "../components/SubmissionList.jsx";
 
 const ProblemDetails = () => {
