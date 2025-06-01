@@ -113,6 +113,9 @@ const getOwnPlaylists = asyncHandler(async (req, res) => {
         where: {
             userId: req.user.id,
         },
+        orderBy: {
+            createdAt: "desc",
+        },
         include: {
             problems: {
                 include: {

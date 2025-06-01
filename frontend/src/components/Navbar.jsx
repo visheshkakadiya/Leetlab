@@ -51,11 +51,11 @@ const Navbar = () => {
                     />
 
                     {toggleMenu && (
-                        <div className='absolute right-0 mt-2 w-40 bg-white shadow-md rounded-md overflow-hidden text-sm'>
+                        <div className='absolute right-0 mt-2 w-40 bg-[#222222] shadow-md rounded-md overflow-hidden text-sm'>
                             {user?.role === 'ADMIN' && (
                                 <Link
                                     to='/create-problem'
-                                    className='flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-gray-100 border-t border-gray-200'
+                                    className='flex items-center gap-2 px-4 py-2 text-slate-200 hover:bg-white/10 border-t border-gray-200 hover:cursor-pointer'
                                     onClick={() => setToggleMenu(false)}
                                 >
                                     <FontAwesomeIcon icon={faPlus} />
@@ -67,7 +67,7 @@ const Navbar = () => {
                                     <button
                                         key={index}
                                         onClick={handleLogout}
-                                        className='flex w-full items-center gap-2 px-4 py-2 text-gray-700 hover:bg-gray-100 text-left'
+                                        className='flex w-full items-center gap-2 px-4 py-2 text-slate-200 hover:bg-white/10 text-left hover:cursor-pointer'
                                     >
                                         {item.icon}
                                         {item.title}
@@ -76,7 +76,7 @@ const Navbar = () => {
                                     <Link
                                         to={item.link}
                                         key={index}
-                                        className='flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-gray-100'
+                                        className='flex items-center gap-2 px-4 py-2 text-slate-200 hover:bg-white/10 hover:cursor-pointer'
                                         onClick={() => setToggleMenu(false)}
                                     >
                                         {item.icon}

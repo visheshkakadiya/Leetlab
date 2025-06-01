@@ -333,11 +333,14 @@ export const ProblemDetail = () => {
                     </div>
                 </div>
 
-                <div className='flex flex-row gap-2'>
-                    <button className="bg-blue-600 hover:bg-blue-700 px-3 py-2 rounded text-sm font-medium flex gap-2"
+                <div className="flex flex-row gap-2">
+                    <button
+                        className={`px-3 py-2 rounded text-sm font-medium flex gap-2 bg-blue-600 hover:bg-blue-700
+      ${submitting ? 'opacity-50 cursor-not-allowed' : ''}`}
                         onClick={handleCodeRun}
+                        disabled={submitting}
                     >
-                        {running ? (
+                        {running && !submitting ? (
                             <>
                                 <Loader2 size={20} className="animate-spin" /> Running
                             </>
@@ -348,10 +351,14 @@ export const ProblemDetail = () => {
                             </>
                         )}
                     </button>
-                    <button className="bg-green-600 hover:bg-green-700 px-3 py-2 rounded text-sm font-medium flex gap-2"
+
+                    <button
+                        className={`px-3 py-2 rounded text-sm font-medium flex gap-2 bg-green-600 hover:bg-green-700
+                                ${running ? 'opacity-50 cursor-not-allowed' : ''}`}
                         onClick={handleSubmitCode}
+                        disabled={running}
                     >
-                        {submitting ? (
+                        {submitting && !running ? (
                             <>
                                 <Loader2 size={20} className="animate-spin" /> Compiling
                             </>
@@ -462,13 +469,13 @@ export const ProblemDetail = () => {
                                         {Key === "Accepted" && editorialTab === "Accepted" && (
                                             <span
                                                 onClick={(e) => {
-                                                    e.stopPropagation(); 
+                                                    e.stopPropagation();
                                                     setSubmissionId(null);
                                                     setEditorialTab("editorial");
                                                 }}
                                                 className="ml-1 text-gray-400 hover:text-white text-xs cursor-pointer"
                                             >
-                                                <X size={15} className='mt-1 ml-1 hover:bg-white/10'/>
+                                                <X size={15} className='mt-1 ml-1 hover:bg-white/10' />
                                             </span>
                                         )}
                                     </button>

@@ -6,7 +6,7 @@ import { SideBar } from '../components/SideBar';
 const PlaylistLayout = () => {
     return (
         <div className="h-screen flex flex-col w-full">
-            <div className="flex flex-1 overflow-hidden">
+            <div className="flex flex-1 overflow-hidden bg-[#0e1111]">
                 <SideBar />
                 <div className="flex-1 overflow-y-auto">
                     <Outlet />

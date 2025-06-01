@@ -94,7 +94,6 @@ export const RemoveProblemFromPlaylist = createAsyncThunk("RemoveProblemFromPlay
 export const togglePublish = createAsyncThunk("togglePublish", async (playlistId) => {
     try {
         const response = await axiosInstance.patch(`/playlist/toggle-published/${playlistId}`)
-        toast.success("Playlist published")
         return response.data
     } catch (error) {
         toast.error(error.response?.data?.message || "Failed to publish playlist")
@@ -172,8 +171,7 @@ const playlistSlice = createSlice({
             })
             .addCase(getOwnPlaylists.fulfilled, (state, action) => {
                 state.loading = false
-                state.playlists = action.payload
-                state.playlist = action.payload[0]
+                state.playlists = [...action.payload]
             })
             .addCase(getPlaylistById.fulfilled, (state, action) => {
                 state.playlist = action.payload

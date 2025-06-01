@@ -55,7 +55,6 @@ export const EditPlaylist = ({ isOpen, onClose, playlist }) => {
 
       await dispatch(updatePlaylist(updateData));
       await dispatch(getOwnPlaylists());
-      await dispatch(getPlaylistById(playlist.id));
       onClose();
     } catch (error) {
       console.error('Error updating playlist:', error);
