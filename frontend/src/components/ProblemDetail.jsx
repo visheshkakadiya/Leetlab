@@ -514,7 +514,7 @@ export const ProblemDetail = () => {
                             </div>
 
                             {/* Test Case Panel */}
-                            <div className="h-[40%] bg-[#2d2d2d] border border-gray-700 rounded-lg flex flex-col overflow-hidden">
+                            <div className="h-[40%] bg-[#2d2d2d] border border-gray-700 rounded-lg flex flex-col overflow-hidden mb-2">
                                 <div className="flex-shrink-0 bg-[#2d2d2d] border-b border-gray-600">
                                     <div className="flex">
                                         {[

@@ -21,7 +21,7 @@ export const AddToPlaylist = ({ problemId }) => {
     // console.log('playlists', playlists);
     // console.log('playlist', playlist);
 
-    const isPoblemInPlaylist = playlist.problems?.some(p => p.problemId === problemId);
+    // const isPoblemInPlaylist = playlist?.problems?.some(p => p.problemId === problemId);
 
     const isProblemInAnyPlaylist = playlists?.some((p) =>
         p.problems?.some(pr => pr.problemId === problemId)

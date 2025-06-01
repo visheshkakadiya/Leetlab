@@ -14,6 +14,8 @@ import ProblemPage from './page/ProblemPage.jsx'
 import ProblemDetails from './page/ProblemDetails.jsx'
 import { ProblemDetail } from './components/ProblemDetail.jsx'
 import { Testing } from './components/Testing.jsx'
+import PlaylistLayout from './Layout/PlaylistLayout.jsx'
+import ProblemProgress from './components/Testing2.jsx'
 
 const App = () => {
 
@@ -64,10 +66,14 @@ const App = () => {
           <Route path='' element={<ProblemPage />} />
         </Route>
 
-        <Route 
-          path='/testing'
+        <Route path='/testing2' element={<ProblemProgress />} />
+
+        <Route path='/playlist/:playlistId' element={<PlaylistLayout />}>
+          <Route 
+          path=''
           element={<Testing />}
         />
+        </Route>
 
         <Route 
           path='/problem/:id'

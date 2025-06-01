@@ -141,7 +141,23 @@ const getPlaylistById = asyncHandler(async (req, res) => {
         include: {
             problems: {
                 include: {
-                    problem: true,
+                    problem: {
+                        include: {
+                            solvedBy: {
+                                where: {
+                                    userId: req.user.id,
+                                },
+                                select: {
+                                    problem: true,
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            user: {
+                select: {
+                    name: true,
                 }
             }
         }

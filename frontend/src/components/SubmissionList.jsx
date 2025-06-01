@@ -121,7 +121,7 @@ const SubmissionsList = ({ submissions, isLoading, submissionId }) => {
                 <div className="col-span-2">
                   <div className="text-sm">
                     <div className="flex gap-2 font-medium text-white/80">
-                      <Clock size={20}/>{avgTime.toFixed(3)} s
+                      <Clock size={20} className="text-blue-400" />{avgTime.toFixed(3)} s
                     </div>
                   </div>
                 </div>
@@ -129,7 +129,7 @@ const SubmissionsList = ({ submissions, isLoading, submissionId }) => {
                 <div className="col-span-3">
                   <div className="text-sm">
                     <div className="flex gap-2 font-medium text-white/80">
-                      <Cpu size={20}/>{avgMemory ? 1024 ? `${(avgMemory / 1024).toFixed(2)} MB` : `${avgMemory} KB` : "N/A"}
+                      <Cpu size={20} className="text-orange-400" />{avgMemory ? 1024 ? `${(avgMemory / 1024).toFixed(2)} MB` : `${avgMemory} KB` : "N/A"}
                     </div>
                   </div>
                 </div>

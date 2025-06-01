@@ -23,16 +23,20 @@ export const createPlaylist = createAsyncThunk("createPlaylist", async (data) =>
     }
 })
 
-export const updatePlaylist = createAsyncThunk("updatePlaylist", async ({data, playlistId}) => {
+
+export const updatePlaylist = createAsyncThunk("updatePlaylist", async ({ playlistId, name, description }) => {
     try {
-        const response = await axiosInstance.put(`/playlist/update-playlist/${playlistId}`, data)
-        toast.success("Playlist updated")
-        return response.data
+        const response = await axiosInstance.patch(`/playlist/update-playlist/${playlistId}`, {
+            name,
+            description
+        });
+        toast.success("Playlist updated");
+        return response.data;
     } catch (error) {
-        toast.error(error.response?.data?.message || "Failed to update playlist")
-        throw error
+        toast.error(error.response?.data?.message || "Failed to update playlist");
+        throw error;
     }
-})
+});
 
 export const deletePlaylist = createAsyncThunk("deletePlaylist", async (playlistId) => {
     try {
@@ -65,7 +69,7 @@ export const getOwnPlaylists = createAsyncThunk("getOwnerPlaylists", async () =>
     }
 })
 
-export const AddProblemToPlaylist = createAsyncThunk("AddProblemToPlaylist", async ({playlistId, problemId}) => {
+export const AddProblemToPlaylist = createAsyncThunk("AddProblemToPlaylist", async ({ playlistId, problemId }) => {
     try {
         const response = await axiosInstance.post(`/playlist/add-problem/${playlistId}/${problemId}`)
         toast.success("Problem added to playlist")
@@ -76,7 +80,7 @@ export const AddProblemToPlaylist = createAsyncThunk("AddProblemToPlaylist", asy
     }
 })
 
-export const RemoveProblemFromPlaylist = createAsyncThunk("RemoveProblemFromPlaylist", async ({playlistId, problemId}) => {
+export const RemoveProblemFromPlaylist = createAsyncThunk("RemoveProblemFromPlaylist", async ({ playlistId, problemId }) => {
     try {
         const response = await axiosInstance.delete(`/playlist/remove-problem/${playlistId}/${problemId}`)
         toast.success("Problem removed from playlist")
@@ -89,7 +93,7 @@ export const RemoveProblemFromPlaylist = createAsyncThunk("RemoveProblemFromPlay
 
 export const togglePublish = createAsyncThunk("togglePublish", async (playlistId) => {
     try {
-        const response = await axiosInstance.put(`/playlist/toggle-published/${playlistId}`)
+        const response = await axiosInstance.patch(`/playlist/toggle-published/${playlistId}`)
         toast.success("Playlist published")
         return response.data
     } catch (error) {
@@ -159,7 +163,9 @@ const playlistSlice = createSlice({
             })
             .addCase(RemoveProblemFromPlaylist.fulfilled, (state, action) => {
                 state.loading = false,
-                    state.playlist = action.payload
+                    state.playlist.problems = state.playlist.problems.filter(
+                        (problemData) => problemData.problem?.id !== action.payload.id
+                    );
             })
             .addCase(getUserPlaylists.fulfilled, (state, action) => {
                 state.playlists = action.payload

@@ -45,16 +45,16 @@ export const SideBar = () => {
 
             <ul className="space-y-1">
                 {playlists.length > 0 ? (
-                    playlists.map((playlist) => (
+                    playlists.map((playlist, index) => (
                         <li
-                            key={playlist.id}
+                            key={playlist?.id || index}
                             className="flex items-center justify-between px-4 py-2 hover:bg-[#222222] transition-colors rounded-md"
                             onClick={() => navigate(`/playlist/${playlist.id}`)}
                         >
                             <div className="flex items-center gap-2 cursor-pointer w-full">
                                 <span><NotepadText size={20} /></span>
                                 <span className="truncate text-sm text-white flex-1">{playlist.name}</span>
-                                {isPublish ? (
+                                {playlist?.isPublished ? (
                                     <span><Globe size={20} /></span>
                                 ) : (
                                     <span><Lock size={20} /></span>
