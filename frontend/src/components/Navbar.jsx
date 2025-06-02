@@ -10,6 +10,7 @@ const Navbar = () => {
     const dispatch = useDispatch()
     const navigate = useNavigate()
     const authUser = useSelector((state) => state.auth?.status)
+    const userId = useSelector((state) => state.auth?.user?.id)
     const avatar = useSelector((state) => state.auth?.user?.avatar?.url)
     const user = useSelector((state) => state.auth?.user)
     const [toggleMenu, setToggleMenu] = useState(false)
@@ -18,7 +19,7 @@ const Navbar = () => {
         {
             icon: <FontAwesomeIcon icon={faUser} />,
             title: 'Visit Profile',
-            link: '/profile'
+            link: `/profile/${userId}`,
         },
         {
             icon: <FontAwesomeIcon icon={faRightFromBracket} />,

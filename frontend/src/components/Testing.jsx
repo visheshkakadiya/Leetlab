@@ -28,7 +28,6 @@ import { useNavigate, useParams, Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import Box from '@mui/joy/Box';
 import CircularProgress from '@mui/joy/CircularProgress';
-import Typography from '@mui/joy/Typography';
 import { currentUser } from '../store/Slices/authSlice.js';
 import { useMemo } from 'react';
 import { EditPlaylist } from './EditPlaylist.jsx';

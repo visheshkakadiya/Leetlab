@@ -14,6 +14,9 @@ const getAllSubmission = asyncHandler(async (req, res) => {
     const submission = await db.submission.findMany({
         where: {
             userId: userId,
+        },
+        include: {
+            problem: true,
         }
     })
 

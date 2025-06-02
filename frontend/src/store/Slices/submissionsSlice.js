@@ -13,7 +13,7 @@ const initialState = {
 export const getAllSubmissions = createAsyncThunk("getAllSubmissions", async () => {
     try {
         const response = await axiosInstance.get("/submission/get-all-submissions")
-        return response.data;
+        return response.data.data;
     } catch (error) {
         toast.error(error.response?.data?.message || "No Submissions found")
         throw error

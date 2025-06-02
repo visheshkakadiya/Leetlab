@@ -16,6 +16,7 @@ import { ProblemDetail } from './components/ProblemDetail.jsx'
 import { Testing } from './components/Testing.jsx'
 import PlaylistLayout from './Layout/PlaylistLayout.jsx'
 import ProblemProgress from './components/Testing2.jsx'
+import { ProfileDetails } from './components/ProfileDetails.jsx'
 
 const App = () => {
 
@@ -37,6 +38,11 @@ const App = () => {
               <HomePage />
             </AuthLayout>
           } />
+
+          <Route 
+            path='/profile/:userId'
+            element={<ProfileDetails />}
+          />
         </Route>
         <Route
           path='/login'
@@ -68,14 +74,14 @@ const App = () => {
 
         <Route path='/testing2' element={<ProblemProgress />} />
 
-        <Route path='/playlist/:playlistId' element={<PlaylistLayout />}>
-          <Route 
-          path=''
-          element={<Testing />}
-        />
+        <Route path='/' element={<PlaylistLayout />}>
+          <Route
+            path='playlist/:playlistId'
+            element={<Testing />}
+          />
         </Route>
 
-        <Route 
+        <Route
           path='/problem/:id'
           element={
             <AuthLayout authentication={true}>

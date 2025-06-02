@@ -5,8 +5,9 @@ import { SideBar } from '../components/SideBar';
 
 const PlaylistLayout = () => {
     return (
-        <div className="h-screen flex flex-col w-full">
-            <div className="flex flex-1 overflow-hidden bg-[#0e1111]">
+        <div className="h-screen flex flex-col w-full bg-[#0e1111]">
+            <Navbar />
+            <div className="flex flex-1 overflow-hidden">
                 <SideBar />
                 <div className="flex-1 overflow-y-auto">
                     <Outlet />
