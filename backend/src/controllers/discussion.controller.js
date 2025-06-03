@@ -5,10 +5,10 @@ import ApiResponse from "../utils/ApiResponse.js";
 
 const createDiscussion = asyncHandler(async (req, res) => {
 
-    const {title, content} = req.body;
-    const userId = req.user?.Id;
+    const { title, content } = req.body;
+    const userId = req.user.id;
 
-    if(!title || !content) {
+    if (!title || !content) {
         throw new ApiError(400, "Title and content are required");
     }
 
@@ -20,7 +20,7 @@ const createDiscussion = asyncHandler(async (req, res) => {
         }
     })
 
-    if(!discussion) {
+    if (!discussion) {
         throw new ApiError(500, "failed to create deiscussion")
     }
 
@@ -31,10 +31,10 @@ const createDiscussion = asyncHandler(async (req, res) => {
 
 const updateDiscussion = asyncHandler(async (req, res) => {
 
-    const {title, content} = req.body;
-    const {discussionId} = req.params;
+    const { title, content } = req.body;
+    const { discussionId } = req.params;
 
-    if(!title || !content) {
+    if (!title || !content) {
         throw new ApiError(400, "Title and content are required");
     }
 
@@ -44,10 +44,10 @@ const updateDiscussion = asyncHandler(async (req, res) => {
         }
     })
 
-    if(!discussion) {
+    if (!discussion) {
         throw new ApiError(401, "Discussion not found")
     }
-    
+
     const updatedDiscussion = await db.discussion.update({
         where: {
             id: discussionId,
@@ -58,7 +58,7 @@ const updateDiscussion = asyncHandler(async (req, res) => {
         }
     });
 
-    if(!updatedDiscussion) {
+    if (!updatedDiscussion) {
         throw new ApiError(500, "failed to update discussion")
     }
 
@@ -68,7 +68,7 @@ const updateDiscussion = asyncHandler(async (req, res) => {
 })
 
 const deleteDiscussion = asyncHandler(async (req, res) => {
-    const {discussionId} = req.params;
+    const { discussionId } = req.params;
 
     const discussion = await db.discussion.findUnique({
         where: {
@@ -76,7 +76,7 @@ const deleteDiscussion = asyncHandler(async (req, res) => {
         }
     })
 
-    if(!discussion) {
+    if (!discussion) {
         throw new ApiError(401, "Discussion not found")
     }
 
@@ -86,7 +86,7 @@ const deleteDiscussion = asyncHandler(async (req, res) => {
         }
     })
 
-    if(!deletedDiscussion) {
+    if (!deletedDiscussion) {
         throw new ApiError(500, "failed to delete Discussion")
     }
 
@@ -96,66 +96,56 @@ const deleteDiscussion = asyncHandler(async (req, res) => {
 })
 
 const getAllDiscussions = asyncHandler(async (req, res) => {
-    const {sort} = req.query;
+    const { sort } = req.query;
 
-    if(sort) {
-        const sortDiscussions = await db.discussion.findMany({
-            orderBy: {
-                upvotes: 'desc'
-            },
+    const fetchDiscussions = async (orderBy = undefined) => {
+        const discussions = await db.discussion.findMany({
+            orderBy,
             include: {
                 user: {
                     select: {
                         id: true,
                         name: true,
                         imageUrl: true,
-                    }
+                    },
                 },
-            }
-        })
-
-        if(!sortDiscussions) {
-            throw new ApiError(500, "failed to fetch discussions")
-        }
-        const replies = await db.reply.count({
-            where: {
-                discussionId: sortDiscussions.id
-            }
-        })
-
-        if(!replies) {
-            throw new ApiError(500, "failed to fetch replies count")
-        }
-
-        res.status(200).json(
-            new ApiResponse(200, {sortDiscussions, replies}, "Discussions fetched successfully")
-        )
-    }
-
-    const discussions = await db.discussion.findMany({
-        include: {
-            user: {
-                select: {
-                    id: true,
-                    name: true,
-                    imageUrl: true,
-                }
             },
+        });
+
+        if (!discussions || discussions.length === 0) {
+            throw new ApiError(404, "No discussions found");
         }
-    })
 
-    if(!discussions) {
-        throw new ApiError(500, "failed to fetch discussions")
-    }
+        const discussionsWithReplies = await Promise.all(
+            discussions.map(async (discussion) => {
+                const replyCount = await db.reply.count({
+                    where: { discussionId: discussion.id },
+                });
 
-    res.status(200).json(
-        new ApiResponse(200, discussions, "Discussions fetched successfully")
-    )
+                return {
+                    ...discussion,
+                    repliesCount: replyCount,
+                };
+            })
+        );
+
+        return discussionsWithReplies;
+    };
+
+    const discussions = sort === "upvotes"
+        ? await fetchDiscussions({ upvotes: "desc" })
+        : await fetchDiscussions();
+    res
+        .status(200)
+        .json(
+            new ApiResponse(200, discussions, "Discussions fetched successfully")
+        );
 });
+
 
 const getDiscussionById = asyncHandler(async (req, res) => {
 
-    const {discussionId} = req.params;
+    const { discussionId } = req.params;
 
     const discussion = await db.discussion.update({
         where: {
@@ -188,7 +178,7 @@ const getDiscussionById = asyncHandler(async (req, res) => {
         }
     })
 
-    if(!discussion) {
+    if (!discussion) {
         throw new ApiError(404, "Discussion not found")
     }
 
@@ -196,3 +186,11 @@ const getDiscussionById = asyncHandler(async (req, res) => {
         new ApiResponse(200, discussion, "Discussion fetched successfully")
     )
 })
+
+export {
+    createDiscussion,
+    updateDiscussion,
+    deleteDiscussion,
+    getAllDiscussions,
+    getDiscussionById
+}

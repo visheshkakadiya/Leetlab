@@ -126,9 +126,38 @@ const getSubmissionById = asyncHandler(async (req, res) => {
     )
 })
 
+const gitContribution = asyncHandler(async (req, res) => {
+
+    const userId = req.user.Id
+
+    const results = await db.submission.groupBy({
+        by: ["createdAt"],
+        where: {
+            userId: userId,
+        },
+        _count: {
+            _all: true,
+        }
+    })
+
+    if (!results) {
+        throw new ApiError(404, "No Contributions found for this user");
+    }
+
+    const contributions = results.map((r) => ({
+        date: r.createdAt.toISOString().split('T')[0],
+        count: r._count._all,
+    }))
+
+    res.status(200).json(
+        new ApiResponse(200, contributions, "Submissions fetched successfully")
+    )
+})
+
 export {
     getAllSubmission,
     getSubmissionsForProblem,
     totalSubmissionsForProblem,
-    getSubmissionById
+    getSubmissionById,
+    gitContribution,
 }

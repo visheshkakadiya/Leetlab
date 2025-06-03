@@ -61,25 +61,11 @@ const register = asyncHandler(async (req, res) => {
 
     const hashedPassword = await hashPassword(password);
 
-    const avatarLocalPath = req.file?.path;
-
-    if (!avatarLocalPath) {
-        throw new ApiError(400, "Please upload an avatar");
-    }
-
-    const avatar = await uploadOnCloudinary(avatarLocalPath);
-
-    if (!avatar) {
-        throw new ApiError(500, "Error uploading avatar");
-    }
-
     const newUser = await db.user.create({
         data: {
             email,
             name,
             password: hashedPassword,
-            imageUrl: avatar.secure_url,
-            imageId: avatar.public_id,
             role: UserRole.USER,
         },
     });
@@ -95,10 +81,9 @@ const register = asyncHandler(async (req, res) => {
                 id: newUser.id,
                 name: newUser.name,
                 email: newUser.email,
-                image: newUser.imageUrl,
                 role: newUser.role,
             },
-            "User created successfully"
+            "User Register successfully"
         )
     );
 });
@@ -354,6 +339,106 @@ const updateProfile = asyncHandler(async (req, res) => {
         );
 });
 
+const userProfile = asyncHandler(async (req, res) => {
+
+    const userId = req.user.id;
+    const user = await db.user.findUnique({
+        where: {
+            id: userId,
+        },
+        include: {
+            submissions: true,
+            discussions: true,
+            replies: true,
+            reputation: true,
+        }
+    });
+    if (!user) {
+        throw new ApiError(404, "User not found");
+    }
+    return res
+        .status(200)
+        .json(new ApiResponse(200, { user }, "User profile fetched successfully"));
+})
+
+const streakTrack = asyncHandler(async (req, res) => {
+    const userId = req.user.id;
+    let streak = 0;
+    let maxStreak = 0;
+
+    const submission = await db.submission.findMany({
+        where: {
+            userId: userId,
+            status: "Accepted",
+        },
+        select: {
+            createdAt: true,
+        },
+        orderBy: {
+            createdAt: "desc",
+        },
+    })
+
+
+    if (!submission || submission.length === 0) {
+        throw new ApiError(404, "Submission not found");
+    }
+
+    const uniqueDays = Array.from(
+        new Set(submission.map((item) => item.createdAt.toISOString().split("T")[0]))
+    ).sort((a, b) => new Date(b) - new Date(a));
+
+    // console.log("Unique days: ", uniqueDays)
+
+    const mostRecentDate = new Date(uniqueDays[0]);
+    
+    for (let i = 0; i < uniqueDays.length; i++) {
+
+        const expectedDate = new Date(mostRecentDate);
+        expectedDate.setDate(expectedDate.getDate() - i);
+        const expectedDateString = expectedDate.toISOString().split("T")[0];
+        
+        // console.log("Expected date: ", expectedDateString)
+        
+        if (uniqueDays.includes(expectedDateString)) {
+            streak++;
+            maxStreak = Math.max(maxStreak, streak);
+        } else {
+            break;
+        }
+    }
+
+    const today = new Date().toISOString().split("T")[0];
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    const yesterdayString = yesterday.toISOString().split("T")[0];
+
+    if (!uniqueDays.includes(today) && !uniqueDays.includes(yesterdayString)) {
+        streak = 0;
+    }
+
+    const updatedStreak = await db.user.update({
+        where: {
+            id: userId,
+        },
+        data: {
+            streak: streak,
+            maxStreak: maxStreak
+        }
+    })
+
+    // console.log("Final streak:", streak)
+    // console.log("Final maxStreak:", maxStreak)
+
+    if (!updatedStreak) {
+        throw new ApiError(500, "Error updating streak");
+    }
+
+    return res.status(200).json(
+        new ApiResponse(200, { streak: streak, maxStreak: maxStreak }, "Streak updated successfully")
+    )
+})
+
 export {
     register,
     login,
@@ -363,4 +448,6 @@ export {
     forgotPassword,
     resetPassword,
     updateProfile,
+    streakTrack,
+    userProfile
 };

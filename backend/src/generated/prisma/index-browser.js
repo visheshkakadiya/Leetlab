@@ -130,6 +130,15 @@ exports.Prisma.UserScalarFieldEnum = {
   resetPasswordToken: 'resetPasswordToken',
   resetPasswordExpiry: 'resetPasswordExpiry',
   createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  streak: 'streak',
+  maxStreak: 'maxStreak'
+};
+
+exports.Prisma.ReputationScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
 
@@ -139,6 +148,7 @@ exports.Prisma.ProblemScalarFieldEnum = {
   description: 'description',
   difficulty: 'difficulty',
   tags: 'tags',
+  company: 'company',
   userId: 'userId',
   examples: 'examples',
   constraints: 'constraints',
@@ -231,6 +241,22 @@ exports.Prisma.ReplyScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.UpVotesScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  discussionId: 'discussionId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.DownVotesScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  discussionId: 'discussionId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -268,6 +294,7 @@ exports.Diffuculty = exports.$Enums.Diffuculty = {
 
 exports.Prisma.ModelName = {
   User: 'User',
+  Reputation: 'Reputation',
   Problem: 'Problem',
   Submission: 'Submission',
   TestCaseResult: 'TestCaseResult',
@@ -275,7 +302,9 @@ exports.Prisma.ModelName = {
   Playlist: 'Playlist',
   ProblemInPlaylist: 'ProblemInPlaylist',
   Discussion: 'Discussion',
-  Reply: 'Reply'
+  Reply: 'Reply',
+  UpVotes: 'UpVotes',
+  DownVotes: 'DownVotes'
 };
 
 /**

@@ -18,7 +18,7 @@ import {
 import { getAllProblems } from '../store/Slices/problemSlice.js'
 import { getUserPlaylists } from '../store/Slices/playlistSlice.js'
 import { useSelector, useDispatch } from 'react-redux';
-import { getAllSubmissions } from '../store/Slices/submissionsSlice.js';
+import { getAllSubmissions, gitContribution } from '../store/Slices/submissionsSlice.js';
 import { useParams, useNavigate } from 'react-router-dom';
 import CalendarHeatmap from 'react-calendar-heatmap';
 import 'react-calendar-heatmap/dist/styles.css';
@@ -32,6 +32,10 @@ export function ProfileDetails() {
     const problems = useSelector((state) => state.problem?.problems);
     const playlists = useSelector((state) => state.playlist?.playlists);
     const submissions = useSelector((state) => state.submissions?.submissions);
+    const contribution = useSelector((state) => state.submissions?.contribution);
+
+    const today = new Date();
+    const oneYearAgo = new Date().setFullYear(today.getFullYear() - 1);
 
     // console.log('playlists', playlists);
     // console.log('submissions', submissions);
@@ -41,6 +45,7 @@ export function ProfileDetails() {
         dispatch(getAllProblems());
         dispatch(getUserPlaylists(userId));
         dispatch(getAllSubmissions());
+        dispatch(gitContribution());
     }, [dispatch]);
 
     // Calculate stats from your data
@@ -299,26 +304,22 @@ export function ProfileDetails() {
                             </div>
                         </div>
 
-                        <div className="flex flex-col items-center justify-center py-20 text-gray-400">
+                        <div className="flex flex-col items-center justify-center py-5 text-gray-400">
                             <CalendarHeatmap
-                                startDate={new Date('2016-01-01')}
-                                endDate={new Date('2016-12-01')}
-                                values={[
-                                    { date: '2016-01-01', count: 12 },
-                                    { date: '2016-01-22', count: 122 },
-                                    { date: '2016-01-30', count: 38 },
-                                ]}
+                                startDate={oneYearAgo}
+                                endDate={today}
+                                values={contribution}
                                 classForValue={(value) => {
                                     if (!value) {
                                         return 'color-gray';
                                     }
-                                    if (value.count > 100) {
+                                    if (value.count >= 1) {
                                         return 'color-scale-4';
                                     }
-                                    if (value.count > 50) {
+                                    if (value.count >= 2) {
                                         return 'color-scale-3';
                                     }
-                                    if (value.count > 20) {
+                                    if (value.count >= 3) {
                                         return 'color-scale-2';
                                     }
                                     return 'color-scale-1';
@@ -359,7 +360,7 @@ export function ProfileDetails() {
                             ))}
                         </div>
 
-                        <div className="p-6">
+                        <div className="p-4">
                             {activeTab === 'submissions' && (
                                 <div className="space-y-4">
                                     {submissions && submissions.length > 0 ? (
@@ -404,10 +405,10 @@ export function ProfileDetails() {
                                 <div className="space-y-4">
                                     {playlists && playlists.length > 0 ? (
                                         playlists.map((playlist, index) => (
-                                            <div key={index} className="flex items-center justify-between p-4 bg-white/10 rounded-xl hover:bg-white/20 transition-colors hover:cursor-pointer"
+                                            <div key={index} className="flex items-center justify-between p-2 bg-white/10 rounded-xl hover:bg-white/20 transition-colors hover:cursor-pointer"
                                                 onClick={() => navigate(`/playlist/${playlist.id}`)}
                                             >
-                                                <div className="flex items-center space-x-4">
+                                                <div className="flex items-center space-x-4 ml-2">
                                                     <div className="flex-shrink-0">
                                                         <ScrollText size={20} className="text-gray-400" />
                                                     </div>

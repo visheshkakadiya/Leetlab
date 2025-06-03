@@ -39,6 +39,8 @@ model User {
   resetPasswordExpiry DateTime?
   createdAt           DateTime  @default(now())
   updatedAt           DateTime  @updatedAt
+  streak              Int       @default(0)
+  maxStreak           Int       @default(0)
 
   problems      Problem[]
   submission    Submission[]
@@ -46,6 +48,19 @@ model User {
   playlists     Playlist[]
   discussions   Discussion[]
   replies       Reply[]
+  reputation    Reputation[]
+  upVotes       UpVotes[]
+  downVotes     DownVotes[]
+}
+
+model Reputation {
+  id     String @id @default(uuid())
+  userId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  reputedBy User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Problem {
@@ -54,6 +69,7 @@ model Problem {
   description String
   difficulty  Diffuculty
   tags        String[] // ["tag1", "tag2", "tag3"]
+  company     String[]
   userId      String
   examples    Json
   constraints String
@@ -166,14 +182,16 @@ model Discussion {
   userId    String
   title     String
   content   String
-  views     Int
-  upvotes   Int
-  downvotes Int
+  views     Int?     @default(0)
+  upvotes   Int      @default(0)
+  downvotes Int      @default(0)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  replies Reply[]
+  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  replies   Reply[]
+  upVotes   UpVotes[]
+  downVotes DownVotes[]
 }
 
 model Reply {
@@ -187,4 +205,26 @@ model Reply {
 
   discussion Discussion @relation(fields: [discussionId], references: [id], onDelete: Cascade)
   user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model UpVotes {
+  id           String   @id @default(uuid())
+  userId       String
+  discussionId String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  discussion Discussion @relation(fields: [discussionId], references: [id], onDelete: Cascade)
+}
+
+model DownVotes {
+  id           String   @id @default(uuid())
+  userId       String
+  discussionId String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  discussion Discussion @relation(fields: [discussionId], references: [id], onDelete: Cascade)
 }

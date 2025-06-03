@@ -7,7 +7,8 @@ const initialState = {
     submissions: [],
     submission: [],
     submissionIdData: null,
-    submissionCount: 0
+    submissionCount: 0,
+    contribution: []
 }
 
 export const getAllSubmissions = createAsyncThunk("getAllSubmissions", async () => {
@@ -50,6 +51,16 @@ export const getSubmissionById = createAsyncThunk("getSubmissionById", async (su
     }
 })
 
+export const gitContribution = createAsyncThunk("gitContribution", async () => {
+    try {
+        const response = await axiosInstance.get(`/submission/git-contribution`)
+        return response.data.data;
+    } catch (error) {
+        toast.error(error.response?.data?.message || "No Submissions found")
+        throw error
+    }
+})
+
 const submissionsSlice = createSlice({
     name: "submissions",
     initialState,
@@ -83,6 +94,13 @@ const submissionsSlice = createSlice({
             .addCase(getSubmissionById.fulfilled, (state, action) => {
                 state.loading = false;
                 state.submissionIdData = action.payload;
+            })
+            .addCase(gitContribution.pending, (state) => {
+                state.loading = true;
+            })
+            .addCase(gitContribution.fulfilled, (state, action) => {
+                state.loading = false;
+                state.contribution = action.payload;
             })
     }
 })
