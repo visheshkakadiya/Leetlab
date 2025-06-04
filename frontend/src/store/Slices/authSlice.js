@@ -10,16 +10,9 @@ const initialState = {
 }
 
 export const registerUser = createAsyncThunk("register", async (data) => {
-    const formData = new FormData();
-    formData.append("email", data.email);
-    formData.append("password", data.password);
-    formData.append("name", data.name);
-    if (data.avatar) {
-        formData.append("avatar", data.avatar);
-    }
-
+    
     try {
-        const response = await axiosInstance.post("/auth/register", formData);
+        const response = await axiosInstance.post("/auth/register", data);
         toast.success("registered");
         return response.data;
     } catch (error) {
@@ -29,6 +22,7 @@ export const registerUser = createAsyncThunk("register", async (data) => {
 })
 
 export const loginUser = createAsyncThunk("login", async (data) => {
+    console.log(data)
     try {
         const response = await axiosInstance.post("/auth/login", data);
         toast.success("logged in");

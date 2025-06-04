@@ -27,6 +27,7 @@ import submissionRoutes from './routes/submission.routes.js'
 import playlistRoutes from './routes/playlist.routes.js'
 import discussionRoutes from './routes/discussion.routes.js'
 import toggleRoutes from './routes/toggle.routes.js'
+import replyRoutes from './routes/replies.routes.js'
 
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/problems", problemRoutes)
@@ -35,6 +36,7 @@ app.use("/api/v1/submission", submissionRoutes)
 app.use("/api/v1/playlist", playlistRoutes)
 app.use("/api/v1/discussion", discussionRoutes)
 app.use("/api/v1/toggle", toggleRoutes)
+app.use("/api/v1/replies", replyRoutes)
 
 app.listen(process.env.PORT, () => {
     console.log(`Server running on port ${process.env.PORT}`);

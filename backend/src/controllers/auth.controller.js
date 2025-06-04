@@ -347,7 +347,6 @@ const userProfile = asyncHandler(async (req, res) => {
             id: userId,
         },
         include: {
-            submissions: true,
             discussions: true,
             replies: true,
             reputation: true,

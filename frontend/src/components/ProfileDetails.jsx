@@ -37,10 +37,6 @@ export function ProfileDetails() {
     const today = new Date();
     const oneYearAgo = new Date().setFullYear(today.getFullYear() - 1);
 
-    // console.log('playlists', playlists);
-    // console.log('submissions', submissions);
-    // console.log('problems', problems);
-
     useEffect(() => {
         dispatch(getAllProblems());
         dispatch(getUserPlaylists(userId));
@@ -48,9 +44,7 @@ export function ProfileDetails() {
         dispatch(gitContribution());
     }, [dispatch]);
 
-    // Calculate stats from your data
     const AcceptedSubmissions = submissions?.filter(submission => submission.status === 'Accepted') || [];
-    // console.log('AcceptedSubmissions', AcceptedSubmissions);
 
     const totalProblems = problems?.length || 0;
     const totalSolved = problems?.flatMap((problem) => problem.solvedBy.map((entry) => entry.problemId)).length || 0;
@@ -85,10 +79,8 @@ export function ProfileDetails() {
 
     const uniqueJavaSolved = [...new Set(javaSolved)];
 
-    const acceptanceRate = totalSubmissions > 0 ? ((AcceptedSubmissions.length / totalSubmissions) * 100).toFixed(2) : 0;
-    // console.log('acceptanceRate', acceptanceRate);
+    const acceptanceRate = totalSubmissions > 0 ? ((AcceptedSubmissions.length / totalSubmissions) * 100).toFixed(0) : 0;
 
-    // Language stats from your calculated data
     const languages = [
         { name: 'JavaScript', problems: uniqueJavascriptSolved.length, color: 'bg-yellow-500' },
         { name: 'Python', problems: uniquePythonSolved.length, color: 'bg-blue-500' },
@@ -185,7 +177,7 @@ export function ProfileDetails() {
                                     <span className="text-sm text-gray-400">{lang.problems} solved</span>
                                 </div>
                             )) : (
-                                <p className="text-gray-400 text-sm">No languages data yet</p>
+                                <p className="text-gray-400 text-sm">No Solved yet</p>
                             )}
                         </div>
                     </div>
@@ -230,7 +222,7 @@ export function ProfileDetails() {
                                         { label: 'Medium', solved: uniqueMediumSolved.length, total: totalMedium, color: 'text-yellow-400' },
                                         { label: 'Hard', solved: uniqueHardSolved.length, total: totalHard, color: 'text-red-400' }
                                     ].map((difficulty, index) => (
-                                        <div key={index} className="flex items-center justify-between gap-2">
+                                        <div key={index} className="flex items-center justify-between gap-5">
                                             <span className={`${difficulty.color} text-sm font-medium`}>{difficulty.label}</span>
                                             <span className="text-gray-300 text-sm">
                                                 {difficulty.solved}/{difficulty.total}
@@ -429,7 +421,7 @@ export function ProfileDetails() {
                                     ) : (
                                         <div className="text-center py-8 text-gray-400">
                                             <ScrollText size={48} className="mx-auto mb-4 opacity-50" />
-                                            <p>No playlists found</p>
+                                            <p>No playlists || its private</p>
                                         </div>
                                     )}
                                 </div>

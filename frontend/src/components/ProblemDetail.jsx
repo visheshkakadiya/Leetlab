@@ -26,7 +26,6 @@ import { Submission } from "../components/Submission.jsx";
 import SubmissionsList from "../components/SubmissionList.jsx";
 import { useNavigate } from 'react-router-dom';
 
-// Extract CodeEditor as a separate memoized component
 const CodeEditor = React.memo(({ code, setCode, selectedLanguage }) => {
     return (
         <Editor
@@ -151,7 +150,6 @@ export const ProblemDetail = () => {
         }
     };
 
-    // Memoize the editor component to prevent unnecessary re-renders
     const memoizedCodeEditor = useMemo(() => (
         <CodeEditor
             code={code}

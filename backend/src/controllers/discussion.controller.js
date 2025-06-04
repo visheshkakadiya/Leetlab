@@ -109,6 +109,8 @@ const getAllDiscussions = asyncHandler(async (req, res) => {
                         imageUrl: true,
                     },
                 },
+                upVotes: true,
+                replies: true,
             },
         });
 

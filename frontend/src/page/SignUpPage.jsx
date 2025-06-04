@@ -24,9 +24,9 @@ export default function SignupForm() {
   const onSubmit = async (data) => {
     const response = await dispatch(registerUser(data));
     if (response?.payload?.success) {
-      const username = data?.username;
+      const email = data?.email;
       const password = data?.password;
-      const loginResult = await dispatch(loginUser({ username, password }));
+      const loginResult = await dispatch(loginUser({ email, password }));
 
       if (loginResult?.type === "login/fulfilled") {
         navigate("/");

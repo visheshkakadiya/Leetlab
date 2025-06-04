@@ -8,7 +8,8 @@ import {
     resetPassword,
     forgotPassword,
     updateProfile,
-    streakTrack
+    streakTrack,
+    userProfile
 } from "../controllers/auth.controller.js";
 import { authMiddleware } from '../middlewares/auth.middleware.js'
 import { upload } from "../middlewares/multer.middleware.js"
@@ -23,7 +24,7 @@ import {
 
 const router = express.Router();
 
-router.post("/register", validate(registerSchema), upload.single('avatar'), register)
+router.post("/register", validate(registerSchema), register)
 router.post("/login", validate(loginSchema), login)
 router.post("/logout", authMiddleware, logout)
 router.get("/me", authMiddleware, currentUser)
@@ -32,6 +33,6 @@ router.post("/forgot-password", validate(forgotPasswordSchema), forgotPassword)
 router.post("/reset-password/:token", validate(resetPasswordSchema), resetPassword)
 router.post("/update-profile", validate(updateProfileSchema), authMiddleware, updateProfile)
 router.get("/streak", authMiddleware, streakTrack)
-router.get("/user-proflie", authMiddleware, currentUser)
+router.get("/user-profile", authMiddleware, userProfile)
 
 export default router
