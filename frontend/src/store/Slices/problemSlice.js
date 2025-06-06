@@ -15,7 +15,6 @@ export const createProblem = createAsyncThunk("createProblem", async ({name, des
         toast.success("Problem created")
         return response.data
     } catch (error) {
-        toast.error(error.response?.data?.message || "Failed to create problem")
         throw error
     }
 })
@@ -26,7 +25,6 @@ export const updateProblem = createAsyncThunk("updateProblem", async (data, prob
         toast.success("Problem updated")
         return response.data
     } catch (error) {
-        toast.error(error.response?.data?.message || "Failed to update problem")
         throw error
     }
 })
@@ -37,7 +35,6 @@ export const deleteProblem = createAsyncThunk("deleteProblem", async (problemId)
         toast.success("Problem deleted")
         return response.data
     } catch (error) {
-        toast.error(error.response?.data?.message || "Failed to delete problem")
         throw error
     }
 })
@@ -47,7 +44,6 @@ export const getAllProblems = createAsyncThunk("getAllProblems", async () => {
         const response = await axiosInstance.get("/problems/get-allProblems")
         return response.data.data
     } catch (error) {
-        toast.error(error.response?.data?.message || "Failed to get problems")
         throw error
     }
 })
@@ -57,7 +53,6 @@ export const getProblemById = createAsyncThunk("getProblemById", async (problemI
         const response = await axiosInstance.get(`/problems/get-problem/${problemId}`)
         return response.data.data
     } catch (error) {
-        toast.error(error.response?.data?.message || "Failed to get problem")
         throw error
     }
 })
@@ -67,7 +62,6 @@ export const getProblemSolvedByUser = createAsyncThunk("getProblemSolvedByUser",
         const response = await axiosInstance.get("/problems/get-solved-problems")
         return response.data.problems
     } catch (error) {
-        toast.error(error.response?.data?.message || "Failed to get problem")
         throw error
     }
 })

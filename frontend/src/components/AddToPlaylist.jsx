@@ -87,7 +87,7 @@ export const AddToPlaylist = ({ problemId }) => {
                             playlists.map((playlist) => (
                                 <li
                                     key={playlist.id}
-                                    className="flex items-center justify-between px-4 py-2 hover:bg-gray-700 transition-colors"
+                                    className="flex items-center justify-between px-4 py-2 hover:bg-white/10 transition-colors"
                                 >
                                     <label className="flex items-center gap-2 cursor-pointer w-full">
                                         <input

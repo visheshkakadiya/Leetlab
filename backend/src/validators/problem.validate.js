@@ -20,11 +20,14 @@ export const createProblemSchema = Joi.object({
   constraints: Joi.string().required().messages({
     'string.empty': 'Constraints are required',
   }),
+  company: Joi.array().items(Joi.string()).required().messages({
+    'array.base': 'Companies must be an array of strings',
+  }),
   hints: Joi.string().allow(null, ''),
   editorial: Joi.string().allow(null, ''),
   testcases: Joi.array().required("testcases is required"),
   codeSnippets: Joi.object().required(),
-  referenceSolutions: Joi.object().required(),
+  referenceSolutions: Joi.object(),
 });
 
 export const updateProblemSchema = createProblemSchema.fork(

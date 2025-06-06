@@ -7,7 +7,11 @@ import ApiResponse from "../utils/ApiResponse.js";
 
 const createProblem = asyncHandler(async (req, res) => {
     // get all data from request body
-    const { title, description, difficulty, tags, examples, constraints, testcases, codeSnippets, referenceSolutions } = req.body
+    const { title, description, difficulty, tags, examples, constraints, testcases, codeSnippets, referenceSolutions, company, hints } = req.body
+
+    if (!referenceSolutions || typeof referenceSolutions !== "object" || Array.isArray(referenceSolutions)) {
+    throw new ApiError(400, "referenceSolutions must be a non-null object");
+}
 
     if (req.user.role !== 'ADMIN') {
         throw new ApiError(403, "You are not allowed to create problem")
@@ -22,7 +26,6 @@ const createProblem = asyncHandler(async (req, res) => {
     if (existedProblem) {
         throw new ApiError(400, "Problem with this title already exists")
     }
-
     const result = await runReferenceCode(referenceSolutions, testcases)
 
     // if (!result) {
@@ -37,6 +40,8 @@ const createProblem = asyncHandler(async (req, res) => {
             difficulty,
             tags,
             examples,
+            company,
+            hints,
             constraints,
             testcases,
             codeSnippets,

@@ -24,11 +24,9 @@ export const runReferenceCode = async (referenceSolutions, testcases) => {
 
         for (let i = 0; i < results.length; i++) {
             const result = results[i];
-
-            // console.log("Result: ", result)
-
-            if (result.status.id !== 3) {
-                throw new ApiError(400, `Testcase ${i + 1} failed for language ${language}`)
+            console.log("Result-----", result);
+            if (results[i].status.id !== 3) {
+                throw new ApiError(400, `Compilation Error: Testcase ${i + 1} failed for ${language}`);
             }
         }
     }

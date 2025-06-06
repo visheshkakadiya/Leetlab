@@ -4,8 +4,10 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit"
 
 const initialState = {
     user: null,
+    userData: null,
     isLoading: false,
     status: false,
+    streak: null,
     error: null
 }
 
@@ -16,19 +18,16 @@ export const registerUser = createAsyncThunk("register", async (data) => {
         toast.success("registered");
         return response.data;
     } catch (error) {
-        toast.error(error.response?.data?.message || "Registration failed");
         throw error;
     }
 })
 
 export const loginUser = createAsyncThunk("login", async (data) => {
-    console.log(data)
     try {
         const response = await axiosInstance.post("/auth/login", data);
         toast.success("logged in");
         return response.data.data;
     } catch (error) {
-        toast.error(error.response?.data?.message || "Login failed");
         throw error;
     }
 })
@@ -39,7 +38,6 @@ export const logoutUser = createAsyncThunk("logout", async () => {
         toast.success("logged out");
         return response.data;
     } catch (error) {
-        toast.error(error.response?.data?.message || "Logout failed");
         throw error;
     }
 })
@@ -50,7 +48,6 @@ export const refreshAccessToken = createAsyncThunk("refreshAccessToken", async (
         toast.success("Access token refreshed");
         return response.data.data;
     } catch (error) {
-        toast.error(error.response?.data?.message || "Failed to refresh access token");
         throw error;
     }
 })
@@ -66,7 +63,6 @@ export const forgotPassword = createAsyncThunk("forgotPassword", async (email) =
         toast.success("Password reset link sent to your email");
         return response.data;
     } catch (error) {
-        toast.error(error.response?.data?.message || "Failed to send password reset link");
         throw error;
     }
 })
@@ -77,7 +73,6 @@ export const resetPassword = createAsyncThunk("resetPassword", async ({ token, n
         toast.success("Password reset successfully");
         return response.data;
     } catch (error) {
-        toast.error(error.response?.data?.message || "Failed to reset password");
         throw error;
     }
 })
@@ -88,7 +83,24 @@ const updateProfile = createAsyncThunk("updateProfile", async (data) => {
         toast.success("Profile updated");
         return response.data;
     } catch (error) {
-        toast.error(error.response?.data?.message || "Failed to update account details");
+        throw error;
+    }
+})
+
+export const getStreak = createAsyncThunk("getStreak", async () => {
+    try {
+        const response = await axiosInstance.get("/auth/streak");
+        return response.data.data;
+    } catch (error) {
+        throw error;
+    }
+})
+
+export const getProfile = createAsyncThunk("getProfile", async (userId) => {
+    try {
+        const response = await axiosInstance.get(`/auth/user-profile/${userId}`);
+        return response.data.data;
+    } catch (error) {
         throw error;
     }
 })
@@ -135,7 +147,6 @@ const authSlice = createSlice({
             })
             .addCase(currentUser.pending, (state) => {
                 state.isLoading = true;
-                state.status = false;
             })
             .addCase(currentUser.fulfilled, (state, action) => {
                 state.isLoading = false;
@@ -182,6 +193,30 @@ const authSlice = createSlice({
                 state.user = action.payload;
             })
             .addCase(updateProfile.rejected, (state, action) => {
+                state.isLoading = false;
+                state.error = action.error.message;
+            })
+            .addCase(getStreak.pending, (state) => {
+                state.isLoading = true;
+                state.error = null;
+            })
+            .addCase(getStreak.fulfilled, (state, action) => {
+                state.isLoading = false;
+                state.streak = action.payload;
+            })
+            .addCase(getStreak.rejected, (state, action) => {
+                state.isLoading = false;
+                state.error = action.error.message;
+            })
+            .addCase(getProfile.pending, (state) => {
+                state.isLoading = true;
+                state.error = null;
+            })
+            .addCase(getProfile.fulfilled, (state, action) => {
+                state.isLoading = false;
+                state.userData = action.payload;
+            })
+            .addCase(getProfile.rejected, (state, action) => {
                 state.isLoading = false;
                 state.error = action.error.message;
             })

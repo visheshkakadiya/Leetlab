@@ -13,13 +13,13 @@ import { createProblemSchema, updateProblemSchema } from "../validators/problem.
 
 const router = express.Router();
 
-router.post('/create-problem', validate(createProblemSchema), authMiddleware, createProblem);
+router.post('/create-problem', authMiddleware, createProblem);
 
 router.get('/get-allProblems', authMiddleware, getAllProblems);
 
 router.get('/get-problem/:id', authMiddleware, getProblemById);
 
-router.put('/update-problem/:id', validate(updateProblemSchema), authMiddleware, updateProblem)
+router.put('/update-problem/:id', authMiddleware, updateProblem)
 
 router.delete('/delete-problem/:id', authMiddleware, deleteProblem)
 

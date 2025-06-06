@@ -33,7 +33,7 @@ import { useMemo } from 'react';
 import { EditPlaylist } from './EditPlaylist.jsx';
 import { AddToPlaylistPopup } from './AddToPlaylistPopup.jsx';
 
-export const Testing = () => {
+export const PlaylistDetail = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedFilter, setSelectedFilter] = useState('all');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -48,13 +48,10 @@ export const Testing = () => {
 
   const loading = useSelector((state) => state.playlist?.loading);
   const playlist = useSelector((state) => state.playlist?.playlist);
-  console.log("playlist", playlist);
   const user = useSelector((state) => state.auth?.user);
 
-  // Check if current user is the playlist owner
   const isOwner = user?.id === playlist?.userId;
 
-  // Calculate progress data - only for playlist owner
   const problemsInPlaylist = playlist?.problems?.map((problem) => problem?.problemId) || [];
 
   const problemSolved = playlist?.problems?.flatMap(
@@ -71,7 +68,6 @@ export const Testing = () => {
     ? 0
     : Math.round((totalSolved / problemsInPlaylist.length) * 100);
 
-  // Difficulty counts - only for playlist owner
   const totalEasyProblems = playlist?.problems?.filter(
     (problem) => problem?.problem?.difficulty === 'EASY'
   ).length || 0;
@@ -102,7 +98,6 @@ export const Testing = () => {
     )
   ).length || 0;
 
-  // Extract all unique tags
   const allTags = useMemo(() => {
     if (!playlist?.problems) return [];
 
@@ -114,7 +109,6 @@ export const Testing = () => {
     return Array.from(tagsSet);
   }, [playlist]);
 
-  // Filter problems based on search and filter
   const filteredProblems = useMemo(() => {
     if (!playlist?.problems) return [];
 
@@ -135,7 +129,6 @@ export const Testing = () => {
     });
   }, [playlist?.problems, searchQuery, selectedFilter, user?.id]);
 
-  // console.log("filteredProblems", filteredProblems);
 
   useEffect(() => {
     if (playlistId) {
@@ -144,7 +137,6 @@ export const Testing = () => {
     }
   }, [dispatch, playlistId]);
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (problemMenuOpen && !event.target.closest('.problem-menu')) {
@@ -158,10 +150,10 @@ export const Testing = () => {
 
   const handleCopyPlaylist = () => {
     dispatch(copyPlaylist(playlistId))
-    .unwrap()
-    .then(() => {
-      dispatch(getOwnPlaylists())
-    })
+      .unwrap()
+      .then(() => {
+        dispatch(getOwnPlaylists())
+      })
     setIsDropdownOpen(false);
   };
 
@@ -226,9 +218,7 @@ export const Testing = () => {
 
   return (
     <div className="min-h-screen bg-[#0e1111] text-slate-100 flex ml-5">
-      {/* Sidebar - Playlist Info */}
       <div className="w-80 bg-[#222222] border-r border-slate-800 flex flex-col mt-4 mb-4 rounded-xl">
-        {/* Playlist Header */}
         <div className="p-6 border-b border-slate-800">
           <div className="flex items-center space-x-3 mb-4">
             <div className="w-12 h-12 bg-gradient-to-br from-violet-500 to-purple-600 rounded-xl flex items-center justify-center">
@@ -240,7 +230,6 @@ export const Testing = () => {
             </div>
           </div>
 
-          {/* Action Buttons */}
           <div className="flex space-x-2">
             <button className="flex-1 bg-white/10 px-4 py-2.5 rounded-lg flex items-center justify-center space-x-2 transition-colors text-sm font-medium">
               <Play className="w-4 h-4" />
@@ -309,7 +298,6 @@ export const Testing = () => {
           </p>
         </div>
 
-        {/* Progress Section - Only visible to playlist owner */}
         {isOwner && (
           <div className="p-6 border-b bg-white/10 border-slate-800 rounded-xl m-4">
             <h3 className="font-semibold text-slate-200 mb-6">Progress</h3>
@@ -346,7 +334,6 @@ export const Testing = () => {
           </div>
         )}
 
-        {/* Difficulty Breakdown - Only visible to playlist owner */}
         {isOwner && (
           <div className="p-6 border-b border-slate-800">
             <h3 className="font-semibold text-slate-200 mb-4">Difficulty Breakdown</h3>
@@ -403,7 +390,6 @@ export const Testing = () => {
           </div>
         )}
 
-        {/* Tags */}
         <div className="p-6 border-b border-slate-800">
           <h3 className="font-semibold text-slate-200 mb-3">Topics</h3>
           <div className="flex flex-wrap gap-2">
@@ -418,7 +404,6 @@ export const Testing = () => {
           </div>
         </div>
 
-        {/* Meta Info */}
         <div className="p-6 flex-1">
           <div className="space-y-3 text-sm text-slate-400">
             <div className="flex items-center space-x-2">
@@ -433,15 +418,12 @@ export const Testing = () => {
         </div>
       </div>
 
-      {/* Main Content - Problems List */}
       <div className="flex-1 flex flex-col">
-        {/* Header */}
         <div className="bg-[#0e1111]  p-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-2xl font-bold text-slate-100">Problems</h2>
           </div>
 
-          {/* Search and Filter */}
           <div className="flex space-x-4">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
@@ -468,7 +450,6 @@ export const Testing = () => {
           </div>
         </div>
 
-        {/* Problems List */}
         <div className="flex-1 overflow-auto p-6 pt-2">
           <div className="space-y-2">
             {filteredProblems.length > 0 ? (
@@ -510,7 +491,6 @@ export const Testing = () => {
                                   {problem?.difficulty}
                                 </span>
 
-                                {/* Problem menu - only show if user is logged in */}
                                 {user && (
                                   <div className="relative problem-menu">
                                     <button
@@ -532,7 +512,6 @@ export const Testing = () => {
                                           <Plus className="w-4 h-4" />
                                           <span>Add to Playlist</span>
                                         </button>
-                                        {/* Remove from playlist - only for playlist owner */}
                                         {isOwner && (
                                           <button
                                             onClick={() => handleRemoveProblem(problem?.id)}

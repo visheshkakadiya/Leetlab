@@ -341,7 +341,7 @@ const updateProfile = asyncHandler(async (req, res) => {
 
 const userProfile = asyncHandler(async (req, res) => {
 
-    const userId = req.user.id;
+    const {userId} = req.params;
     const user = await db.user.findUnique({
         where: {
             id: userId,

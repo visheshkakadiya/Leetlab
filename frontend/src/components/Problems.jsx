@@ -43,7 +43,7 @@ const ProblemsTable = ({ problems }) => {
             );
     }, [problems, search, difficulty, selectedTag]);
 
-    const itemsPerPage = 5;
+    const itemsPerPage = 10;
     const totalPages = Math.ceil(filteredProblems.length / itemsPerPage);
     const paginatedProblems = useMemo(() => {
         return filteredProblems.slice(
@@ -52,21 +52,20 @@ const ProblemsTable = ({ problems }) => {
         );
     }, [filteredProblems, currentPage]);
 
-
-
     return (
         <div className="w-full max-w-6xl mx-auto mt-10">
 
-            <div className="flex flex-wrap justify-between items-center mb-6 gap-4">
+            <div className="flex flex-wrap justify-start items-center mb-6 gap-4">
                 <input
                     type="text"
-                    placeholder="Search by title"
-                    className="input input-bordered w-full md:w-1/3 bg-base-200"
+                    placeholder="Search by title..."
+
+                    className="input input-bordered w-full md:max-w-xs bg-[#222222] text-white border-gray-700 rounded-lg py-2 px-4"
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                 />
                 <select
-                    className="select select-bordered bg-base-200"
+                    className="select select-bordered w-full md:w-48  bg-[#222222] text-white border-gray-700 rounded-lg py-2 px-4"
                     value={difficulty}
                     onChange={(e) => setDifficulty(e.target.value)}
                 >
@@ -78,7 +77,7 @@ const ProblemsTable = ({ problems }) => {
                     ))}
                 </select>
                 <select
-                    className="select select-bordered bg-base-200"
+                    className="select select-bordered w-full md:w-48 bg-[#222222] text-white border-gray-700 rounded-lg py-2 px-4"
                     value={selectedTag}
                     onChange={(e) => setSelectedTag(e.target.value)}
                 >
@@ -96,10 +95,13 @@ const ProblemsTable = ({ problems }) => {
                     <tbody>
                         {paginatedProblems.length > 0 ? (
                             paginatedProblems.map((problem, index) => {
-                                
+
                                 const isSolved = Array.isArray(problem.solvedBy)
                                     ? problem.solvedBy.some(user => user.userId === authUser?.id)
                                     : false;
+
+                                const currentIndex = index + 1 + (currentPage - 1) * itemsPerPage;
+                                const isDemoIndex = [1, 2, 6, 10].includes(currentIndex);
 
                                 return (
                                     <tr
@@ -111,26 +113,31 @@ const ProblemsTable = ({ problems }) => {
                                         <td colSpan={6} className="p-0">
                                             <div className="flex justify-between items-center">
                                                 <div className="flex items-center gap-4 min-w-0">
-                                                    {isSolved ? <Check className="text-green-400" size={20}/>
-                                                    : (
-                                                        <div className="w-5"></div>
-                                                    )    
-                                                }
-                                                    <div>
+                                                    {isSolved ? <Check className="text-green-400" size={20} />
+                                                        : (
+                                                            <div className="w-5"></div>
+                                                        )
+                                                    }
+                                                    <div className="flex items-center gap-2">
                                                         <span className="text-sm text-gray-400 w-6">
-                                                            {index + 1 + (currentPage - 1) * itemsPerPage}.
+                                                            {currentIndex}.
                                                         </span>
                                                         <Link
-                                                            className="truncate hover:underline font-medium text-white ml-2"
+                                                            className="truncate hover:underline font-medium text-white"
                                                             to={`/problem/${problem.id}`}
                                                         >
                                                             {problem.title}
                                                         </Link>
+                                                        {isDemoIndex && (
+                                                            <span className="bg-blue-500 text-white text-xs px-2 py-1 rounded-full ml-2">
+                                                                demo
+                                                            </span>
+                                                        )}
                                                     </div>
                                                 </div>
 
                                                 <div className="flex items-center gap-6 shrink-0">
-                                                    <span className="relative group text-gray-300 text-sm mr-3 cursor-default">
+                                                    <span className="relative group text-gray-300 text-sm w-4 text-center">
                                                         {totalSubmissions?.[problem.id] ?? 0}
                                                         <span className="absolute bottom-full mb-1 left-1/2 transform -translate-x-1/2 scale-0 rounded bg-gray-700 px-2 py-1 text-xs text-white whitespace-nowrap group-hover:scale-100 transition-transform origin-bottom">
                                                             Total submissions
@@ -138,7 +145,7 @@ const ProblemsTable = ({ problems }) => {
                                                     </span>
 
                                                     <span
-                                                        className={`text-sm ${problem.difficulty === "EASY"
+                                                        className={`text-sm font-medium w-16 text-left ${problem.difficulty === "EASY"
                                                             ? "text-green-400"
                                                             : problem.difficulty === "MEDIUM"
                                                                 ? "text-yellow-400"
@@ -149,15 +156,15 @@ const ProblemsTable = ({ problems }) => {
                                                     </span>
 
                                                     <span
-                                                        className={`mt-2 transition-opacity duration-200 ${hoveredRow === problem.id ? "opacity-100" : "opacity-0"
+                                                        className={`transition-opacity duration-200 ${hoveredRow === problem.id ? "opacity-100" : "opacity-0"
                                                             }`}
                                                     >
                                                         <AddToPlaylist problemId={problem.id} />
                                                     </span>
 
-
                                                     {authUser?.role === "ADMIN" && <Dropdown problemId={problem.id} />}
                                                 </div>
+
                                             </div>
                                         </td>
                                     </tr>

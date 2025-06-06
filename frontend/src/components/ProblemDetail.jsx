@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { useParams, Link, data } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import {
     ChevronLeft,
     Users,
@@ -15,7 +15,11 @@ import {
     Play,
     Loader2,
     Dot,
-    X
+    X,
+    Building2,
+    Lightbulb,
+    ArrowUp,
+    ArrowDown
 } from "lucide-react";
 import Editor from '@monaco-editor/react';
 import { getProblemById } from "../store/Slices/problemSlice.js";
@@ -25,6 +29,11 @@ import { getSubmissionsForProblem, getSubmissionById } from "../store/Slices/sub
 import { Submission } from "../components/Submission.jsx";
 import SubmissionsList from "../components/SubmissionList.jsx";
 import { useNavigate } from 'react-router-dom';
+import Accordion from '@mui/material/Accordion';
+import AccordionActions from '@mui/material/AccordionActions';
+import AccordionSummary from '@mui/material/AccordionSummary';
+import AccordionDetails from '@mui/material/AccordionDetails';
+import Typography from '@mui/material/Typography';
 
 const CodeEditor = React.memo(({ code, setCode, selectedLanguage }) => {
     return (
@@ -55,6 +64,7 @@ export const ProblemDetail = () => {
 
     const problem = useSelector((state) => state.problem?.problem);
     const problemLoading = useSelector((state) => state.problem.loading);
+    console.log(problem);
 
     const submitting = useSelector((state) => state.execute.executing);
     const running = useSelector((state) => state.execute.running);
@@ -165,9 +175,45 @@ export const ProblemDetail = () => {
             case "description":
                 return (
                     <div className="text-sm text-gray-300 leading-relaxed p-4">
+                        {/* Problem Title and Company Tags */}
                         <div className="mb-6">
+                            <div className="flex items-start justify-between mb-4">
+                                <div className="flex-1">
+                                    <h1 className="text-2xl font-bold text-white mb-2">{problem?.title}</h1>
+                                    <div className={`inline-block px-2 py-1 rounded-md text-xs font-medium ${problem?.difficulty === "EASY"
+                                            ? "bg-green-600/20 text-green-300 border border-green-600/30"
+                                            : problem?.difficulty === "MEDIUM"
+                                                ? "bg-yellow-600/20 text-yellow-300 border border-yellow-600/30"
+                                                : "bg-red-600/20 text-red-300 border border-red-600/30"
+                                        }`}>
+                                        {problem?.difficulty}
+                                    </div>
+                                </div>
+
+                                {/* Company Tags - Right Side */}
+                                {problem?.company && problem.company.length > 0 && (
+                                    <div className="ml-4 flex-shrink-0">
+                                        <div className="flex items-center gap-2 mb-2">
+                                            <Building2 className="w-4 h-4 text-blue-400" />
+                                            <span className="text-sm font-medium text-gray-400">Companies:</span>
+                                        </div>
+                                        <div className="flex flex-wrap gap-2 justify-end">
+                                            {problem.company.map((comp, index) => (
+                                                <span
+                                                    key={index}
+                                                    className="px-2 py-1 bg-blue-600/20 text-blue-300 rounded-md text-xs font-medium border border-blue-600/30"
+                                                >
+                                                    {comp}
+                                                </span>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+
                             <p className="mb-4">{problem?.description}</p>
                         </div>
+
                         <div className="space-y-4">
                             {problem?.examples && Object.entries(problem.examples).map(([lang, example], index) => (
                                 <div key={lang} className="bg-[#353839] rounded-lg p-4 space-y-3">
@@ -185,12 +231,62 @@ export const ProblemDetail = () => {
                                 </div>
                             ))}
                         </div>
+
                         <div className="mt-6">
                             <div className="font-semibold text-white mb-2">Constraints:</div>
                             <div className="bg-[#353839] rounded-lg p-3 font-mono text-sm">
                                 {problem?.constraints}
                             </div>
                         </div>
+
+                        {/* Hints Accordion */}
+                        {problem?.hints && problem.hints.length > 0 && (
+                            <div className="mt-6">
+                                <Accordion
+                                    sx={{
+                                        backgroundColor: '#353839',
+                                        color: 'white',
+                                        '&:before': {
+                                            display: 'none',
+                                        },
+                                        boxShadow: 'none',
+                                        borderRadius: '8px',
+                                        overflow: 'hidden'
+                                    }}
+                                >
+                                    <AccordionSummary
+                                        expandIcon={<ArrowDown className="text-white/50" />}
+                                        aria-controls="hints-content"
+                                        id="hints-header"
+                                        sx={{
+                                            backgroundColor: '#353839',
+                                            '&:hover': {
+                                                backgroundColor: '#404143'
+                                            }
+                                        }}
+                                    >
+                                        <div className="flex items-center gap-2">
+                                            <Lightbulb className="w-4 h-4 text-yellow-400" />
+                                            <Typography sx={{ fontWeight: 'bold', fontSize: '16px' }}>
+                                                Hints ({problem.hints.length})
+                                            </Typography>
+                                        </div>
+                                    </AccordionSummary>
+                                    <AccordionDetails sx={{ backgroundColor: '#2d2d2d', padding: '16px' }}>
+                                        <div className="bg-[#353839] rounded-lg p-3">
+                                            <div className="flex items-start gap-2">
+                                                <span className="text-yellow-400 font-bold text-sm mt-1">
+                                                    1.
+                                                </span>
+                                                <Typography sx={{ color: '#d1d5db', fontSize: '14px', lineHeight: '1.5' }}>
+                                                    {problem.hints}
+                                                </Typography>
+                                            </div>
+                                        </div>
+                                    </AccordionDetails>
+                                </Accordion>
+                            </div>
+                        )}
                     </div>
                 );
             case "editorial":
@@ -316,7 +412,6 @@ export const ProblemDetail = () => {
         }
     };
 
-    // Main component return
     return (
         <div className='h-screen bg-[#222222] text-white flex flex-col w-full'>
             <div className="bg-[#222222] border-b border-gray-700 px-2 py-2 flex items-center justify-between">
@@ -324,10 +419,6 @@ export const ProblemDetail = () => {
                     <div className="flex items-center space-x-2" onClick={() => navigate("/problems")}>
                         <ChevronLeft className="w-5 h-5 text-gray-400 cursor-pointer hover:text-white" />
                         <span className="text-sm text-gray-400 hover:text-white hover:cursor-pointer">Problem List</span>
-                    </div>
-                    <div className="w-px h-6 bg-gray-600"></div>
-                    <div className="flex items-center space-x-2">
-                        <span className="text-lg font-medium">{problem?.title}</span>
                     </div>
                 </div>
 
@@ -371,12 +462,6 @@ export const ProblemDetail = () => {
 
                 <div className="flex items-center space-x-4">
                     <div className="flex items-center space-x-2 text-sm text-gray-400">
-                        <span className={`text-sm ${problem?.difficulty === "EASY"
-                            ? "text-green-400"
-                            : problem?.difficulty === "MEDIUM"
-                                ? "text-yellow-400"
-                                : "text-red-400"
-                            }`}>{problem?.difficulty}</span>
                         <Users className="w-4 h-4" />
                         <span>14.1K</span>
                         <MessageSquare className="w-4 h-4" />

@@ -13,7 +13,6 @@ import { NavLink, useLocation } from 'react-router-dom';
 
 export const SideBar = () => {
   const dispatch = useDispatch();
-  const location = useLocation();
   const [modalOpen, setModalOpen] = useState(false);
   const playlists = useSelector((state) => state.playlist.playlists);
 
@@ -23,10 +22,16 @@ export const SideBar = () => {
 
   return (
     <div className="bg-[#0e1111] text-white w-64 h-screen p-4 space-y-2 border-r-1 border-gray-600">
-      <div className="flex items-center space-x-2 bg-white/10 text-white px-3 py-2 rounded-lg mt-2 mb-8">
+      <NavLink
+        to="/problems"
+        className={({ isActive }) =>
+          `flex items-center space-x-2 px-3 py-2 rounded-lg mt-2 mb-8 transition-colors ${isActive ? 'bg-[#222222] text-white pointer-events-none' : 'hover:bg-white/10 text-white'
+          }`
+        }
+      >
         <span><Library size={20} /></span>
         <span className='font-bold'>Programs</span>
-      </div>
+      </NavLink>
 
       <hr />
 
@@ -49,15 +54,13 @@ export const SideBar = () => {
         {playlists.length > 0 ? (
           playlists.map((playlist) => {
             const path = `/playlist/${playlist.id}`;
-            // const isActive = location.pathname === path;
 
             return (
               <NavLink
                 key={playlist.id}
                 to={path}
                 className={({ isActive }) =>
-                  `flex items-center justify-between px-4 py-2 rounded-md transition-colors ${
-                    isActive ? 'bg-[#222222] text-white pointer-events-none' : 'hover:bg-[#222222]'
+                  `flex items-center justify-between px-4 py-2 rounded-md transition-colors ${isActive ? 'bg-[#222222] text-white pointer-events-none' : 'hover:bg-[#222222]'
                   }`
                 }
               >

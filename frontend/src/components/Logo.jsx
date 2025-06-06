@@ -8,7 +8,7 @@ export const Logo = () => {
         <div>
             <Link to="/" className='flex gap-2 items-center'>
                 <FontAwesomeIcon icon={faCode} size="2x" style={{ color: '#A855F7' }} />
-                <span className='font-bold text-white'>leetLab</span>
+                <span className='font-bold text-white'>NexCode</span>
             </Link>
         </div>
     )

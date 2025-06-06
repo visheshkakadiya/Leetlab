@@ -321,7 +321,7 @@ const config = {
     "db": {
       "url": {
         "fromEnvVar": "DATABASE_URL",
-        "value": "postgresql://myuser:mypassword@localhost:5432/postgres"
+        "value": "postgresql://leetlab_owner:npg_nxdSV2oy4jev@ep-patient-flower-a107hmeg-pooler.ap-southeast-1.aws.neon.tech/leetlab?sslmode=require"
       }
     }
   },

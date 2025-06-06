@@ -4,12 +4,12 @@ import { useParams } from 'react-router-dom';
 import { getDiscussionById } from '../store/Slices/discussionSlice.js';
 import { getDiscussionReplies, addReply, updateReply, deleteReply } from "../store/Slices/repliesSlice.js";
 import { toggleUpVotes, toggleDownVotes } from '../store/Slices/toggleSlice.js';
-import { 
-  ChevronUp, 
-  ChevronDown, 
-  MessageCircle, 
-  Share2, 
-  Eye, 
+import {
+  ChevronUp,
+  ChevronDown,
+  MessageCircle,
+  Share2,
+  Eye,
   Code,
   Link,
   AtSign,
@@ -60,7 +60,7 @@ const DiscussionDetail = () => {
     const date = new Date(dateString);
     const now = new Date();
     const diffInHours = Math.floor((now - date) / (1000 * 60 * 60));
-    
+
     if (diffInHours < 1) return 'Just now';
     if (diffInHours < 24) return `${diffInHours} hours ago`;
     if (diffInHours < 48) return 'Yesterday';
@@ -82,15 +82,15 @@ const DiscussionDetail = () => {
         <h1 className="text-xl font-semibold text-white mb-2">
           {discussion?.title}
         </h1>
-        
+
         {/* User Info */}
         <div className="flex items-center gap-4 text-sm text-gray-400">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 bg-gray-600 rounded-full flex items-center justify-center">
               {discussion?.user?.imageUrl ? (
-                <img 
-                  src={discussion.user.imageUrl} 
-                  alt={discussion.user.name} 
+                <img
+                  src={discussion.user.imageUrl}
+                  alt={discussion.user.name}
                   className="w-full h-full rounded-full object-cover"
                 />
               ) : (
@@ -123,7 +123,7 @@ const DiscussionDetail = () => {
 
         {/* Action Bar */}
         <div className="flex items-center gap-6 mb-6 text-gray-400">
-          <button 
+          <button
             onClick={handleDiscussionUpvote}
             className="flex items-center gap-2 hover:text-white transition-colors"
           >
@@ -175,9 +175,9 @@ const DiscussionDetail = () => {
                 {/* Avatar */}
                 <div className="w-8 h-8 bg-gray-600 rounded-full flex items-center justify-center flex-shrink-0">
                   {reply?.user?.imageUrl ? (
-                    <img 
-                      src={reply.user.imageUrl} 
-                      alt={reply.user.name} 
+                    <img
+                      src={reply.user.imageUrl}
+                      alt={reply.user.name}
                       className="w-full h-full rounded-full object-cover"
                     />
                   ) : (
@@ -193,14 +193,14 @@ const DiscussionDetail = () => {
                     <span className="text-white font-medium">{reply?.user?.name}</span>
                     <span className="text-gray-400 text-sm">{formatDate(reply?.createdAt)}</span>
                   </div>
-                  
+
                   <p className="text-gray-300 mb-3 leading-relaxed">
                     {reply?.content}
                   </p>
                 </div>
               </div>
             ))}
-            
+
             {/* Empty state */}
             {(!replies || replies.length === 0) && (
               <div className="text-center py-8 text-gray-400">

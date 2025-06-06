@@ -17,8 +17,6 @@ export const createPlaylist = createAsyncThunk("createPlaylist", async (data) =>
         toast.success("Playlist created")
         return response.data
     } catch (error) {
-        toast.error(error.response?.data?.message || "Failed to create playlist")
-        console.log(error)
         throw error
     }
 })
@@ -33,7 +31,6 @@ export const updatePlaylist = createAsyncThunk("updatePlaylist", async ({ playli
         toast.success("Playlist updated");
         return response.data;
     } catch (error) {
-        toast.error(error.response?.data?.message || "Failed to update playlist");
         throw error;
     }
 });
@@ -44,7 +41,6 @@ export const deletePlaylist = createAsyncThunk("deletePlaylist", async (playlist
         toast.success("Playlist deleted")
         return response.data
     } catch (error) {
-        toast.error(error.response?.data?.message || "Failed to delete playlist")
         throw error
     }
 })
@@ -54,7 +50,6 @@ export const getUserPlaylists = createAsyncThunk("getUserPlaylists", async (user
         const response = await axiosInstance.get(`/playlist/user-playlists/${userId}`)
         return response.data.data
     } catch (error) {
-        toast.error(error.response?.data?.message || "Failed to get playlists")
         throw error
     }
 })
@@ -64,7 +59,6 @@ export const getOwnPlaylists = createAsyncThunk("getOwnerPlaylists", async () =>
         const response = await axiosInstance.get(`/playlist`)
         return response.data.data
     } catch (error) {
-        toast.error(error.response?.data?.message || "Failed to get playlists")
         throw error
     }
 })
@@ -75,7 +69,6 @@ export const AddProblemToPlaylist = createAsyncThunk("AddProblemToPlaylist", asy
         toast.success("Problem added to playlist")
         return response.data
     } catch (error) {
-        toast.error(error.response?.data?.message || "Failed to add problem to playlist")
         throw error
     }
 })
@@ -86,7 +79,6 @@ export const RemoveProblemFromPlaylist = createAsyncThunk("RemoveProblemFromPlay
         toast.success("Problem removed from playlist")
         return response.data
     } catch (error) {
-        toast.error(error.response?.data?.message || "Failed to remove problem from playlist")
         throw error
     }
 })
@@ -96,7 +88,6 @@ export const togglePublish = createAsyncThunk("togglePublish", async (playlistId
         const response = await axiosInstance.patch(`/playlist/toggle-published/${playlistId}`)
         return response.data
     } catch (error) {
-        toast.error(error.response?.data?.message || "Failed to publish playlist")
         throw error
     }
 })
@@ -107,7 +98,6 @@ export const copyPlaylist = createAsyncThunk("copyPlaylist", async (playlistId) 
         toast.success("Playlist copied")
         return response.data
     } catch (error) {
-        toast.error(error.response?.data?.message || "Failed to copy playlist")
         throw error
     }
 })
@@ -117,7 +107,6 @@ export const getPlaylistById = createAsyncThunk("getPlaylistById", async (playli
         const response = await axiosInstance.get(`/playlist/${playlistId}`)
         return response.data.data
     } catch (error) {
-        toast.error(error.response?.data?.message || "Failed to get playlist")
         throw error
     }
 })

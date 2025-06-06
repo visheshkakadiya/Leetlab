@@ -11,15 +11,11 @@ import AddProblem from './page/AddProblemPage.jsx'
 import { currentUser } from './store/Slices/authSlice.js'
 import ProblemLayout from './Layout/ProblemLayout.jsx'
 import ProblemPage from './page/ProblemPage.jsx'
-import ProblemDetails from './page/ProblemDetails.jsx'
 import { ProblemDetail } from './components/ProblemDetail.jsx'
-import { Testing } from './components/Testing.jsx'
+import { PlaylistDetail } from './components/PlaylistDetail.jsx'
 import PlaylistLayout from './Layout/PlaylistLayout.jsx'
-// import Editor from './components/Testing2.jsx'
 import { ProfileDetails } from './components/ProfileDetails.jsx'
-import { Editor } from './components/Editor.jsx'
-import { Community } from './components/Community.jsx'
-import { DiscussionDetail } from './components/DiscussionDetail.jsx'
+import AdminRoute from './components/AdminRoute.jsx'
 
 const App = () => {
 
@@ -27,11 +23,23 @@ const App = () => {
 
   useEffect(() => {
     dispatch(currentUser())
-  })
+  }, [dispatch])
 
   return (
     <div className='flex flex-col items-center justify-center'>
-      <Toaster />
+      <Toaster
+        position="bottom-right"
+        reverseOrder={true}
+        toastOptions={{
+          error: {
+            style: { borderRadius: "0", color: "red" },
+          },
+          success: {
+            style: { borderRadius: "0", color: "green" },
+          },
+          duration: 2000,
+        }}
+      />
       <Routes>
         <Route
           path='/'
@@ -44,11 +52,12 @@ const App = () => {
 
           <Route
             path='/profile/:userId'
-            element={<ProfileDetails />}
+            element={
+              <AuthLayout authentication>
+                <ProfileDetails />
+              </AuthLayout>
+            }
           />
-
-          <Route path='/community' element={<Community />} />
-          <Route path='/discussion/:discussionId' element={<DiscussionDetail />} />
         </Route>
         <Route
           path='/login'
@@ -66,33 +75,36 @@ const App = () => {
             </AuthLayout>
           }
         />
-        <Route
-          path='/create-problem'
-          element={
-            <AuthLayout authentication={true}>
-              <AddProblem />
-            </AuthLayout>
-          }
-        />
-        <Route path='/problems' element={<ProblemLayout />}>
-          <Route path='' element={<ProblemPage />} />
+        <Route element={<AdminRoute />}>
+          <Route
+            path="/create-problem"
+            element={<AddProblem />}
+          />
         </Route>
 
-        {/* <Route path='/testing2' element={<Editor />} /> */}
-
-        <Route path="editor" element={<Editor />} />
+        <Route path='/problems' element={<ProblemLayout />}>
+          <Route path='' element={
+            <AuthLayout authentication>
+              <ProblemPage />
+            </AuthLayout>
+          } />
+        </Route>
 
         <Route path='/' element={<PlaylistLayout />}>
           <Route
             path='playlist/:playlistId'
-            element={<Testing />}
+            element={
+              <AuthLayout authentication>
+                <PlaylistDetail />
+              </AuthLayout>
+            }
           />
         </Route>
 
         <Route
           path='/problem/:id'
           element={
-            <AuthLayout authentication={true}>
+            <AuthLayout authentication>
               <ProblemDetail />
             </AuthLayout>
           }

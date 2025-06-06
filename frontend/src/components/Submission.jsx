@@ -3,12 +3,11 @@ import { BarChart } from "@mui/x-charts/BarChart";
 
 export function Submission({ submission }) {
 
-  if(!submission) {
+  if (!submission) {
     return <div className="flex items-center justify-center h-full">
-        <Loader2 className="animate-spin" size={24} />
+      <Loader2 className="animate-spin" size={24} />
     </div>;
   };
-  console.log("Submission: ", submission);
   const testCaseLength = submission.testCases.length;
 
   const safeParse = (data) => {
@@ -53,16 +52,14 @@ export function Submission({ submission }) {
     <div className="h-full w-full overflow-y-auto overflow-x-hidden">
       <div className="min-h-screen bg-[#222222] p-4">
         <div className="max-w-4xl mx-auto">
-          {/* Header Card */}
           <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-4 mb-6 border border-white/20 shadow-lg">
             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
               <div>
                 <h1
-                  className={`text-lg font-semibold mb-0.5 ${
-                    submission.status === "Accepted"
-                      ? "text-green-400"
-                      : "text-red-400"
-                  }`}
+                  className={`text-lg font-semibold mb-0.5 ${submission.status === "Accepted"
+                    ? "text-green-400"
+                    : "text-red-400"
+                    }`}
                 >
                   {submission.status}
                 </h1>
@@ -88,12 +85,9 @@ export function Submission({ submission }) {
             </div>
           </div>
 
-          {/* Performance and Chart Section */}
           {submission.status === "Accepted" ? (
             <>
-              {/* Performance Cards */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                {/* Runtime */}
                 <div className="bg-white/10 backdrop-blur-lg rounded-xl p-4 border border-white/20 hover:bg-white/15 transition-all duration-300">
                   <div className="flex items-center gap-2 mb-3">
                     <div className="bg-blue-500/20 rounded-lg p-2">
@@ -117,7 +111,6 @@ export function Submission({ submission }) {
                   </div>
                 </div>
 
-                {/* Memory */}
                 <div className="bg-white/10 backdrop-blur-lg rounded-xl p-4 border border-white/20 hover:bg-white/15 transition-all duration-300">
                   <div className="flex items-center gap-2 mb-3">
                     <div className="bg-orange-500/20 rounded-lg p-2">
@@ -141,9 +134,7 @@ export function Submission({ submission }) {
                 </div>
               </div>
 
-              {/* Charts */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Runtime Chart */}
                 <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 shadow-lg hover:bg-white/15 transition-all duration-300">
                   <h3 className="text-white font-medium text-base mb-4">
                     Runtime per Test Case
@@ -163,7 +154,6 @@ export function Submission({ submission }) {
                   />
                 </div>
 
-                {/* Memory Chart */}
                 <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 shadow-lg hover:bg-white/15 transition-all duration-300">
                   <h3 className="text-white font-medium text-base mb-4">
                     Memory per Test Case
@@ -189,7 +179,6 @@ export function Submission({ submission }) {
               </div>
             </>
           ) : (
-            // Non-Accepted: Show error output
             <div className="bg-white/10 text-white/80 text-sm p-4 rounded-xl border border-white/20">
               {submission?.stderr || submission?.compileOutput ? (
                 <>
@@ -203,6 +192,14 @@ export function Submission({ submission }) {
               )}
             </div>
           )}
+          <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-4 mb-6 mt-6 border border-white/20 shadow-lg">
+            <pre className="whitespace-pre-wrap overflow-x-auto text-sm font-mono text-white">
+              <code>
+                {submission.sourceCode}
+              </code>
+            </pre>
+          </div>
+
         </div>
       </div>
     </div>

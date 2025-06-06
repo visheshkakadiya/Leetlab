@@ -20,6 +20,8 @@ import { getUserPlaylists } from '../store/Slices/playlistSlice.js'
 import { useSelector, useDispatch } from 'react-redux';
 import { getAllSubmissions, gitContribution } from '../store/Slices/submissionsSlice.js';
 import { useParams, useNavigate } from 'react-router-dom';
+import {currentUser, getProfile} from '../store/Slices/authSlice.js';
+import { toggleReputation } from '../store/Slices/toggleSlice.js';
 import CalendarHeatmap from 'react-calendar-heatmap';
 import 'react-calendar-heatmap/dist/styles.css';
 
@@ -33,6 +35,8 @@ export function ProfileDetails() {
     const playlists = useSelector((state) => state.playlist?.playlists);
     const submissions = useSelector((state) => state.submissions?.submissions);
     const contribution = useSelector((state) => state.submissions?.contribution);
+    const currentLoggedUser = useSelector((state) => state.auth?.user);
+    const user = useSelector((state) => state.auth?.userData);
 
     const today = new Date();
     const oneYearAgo = new Date().setFullYear(today.getFullYear() - 1);
@@ -42,7 +46,32 @@ export function ProfileDetails() {
         dispatch(getUserPlaylists(userId));
         dispatch(getAllSubmissions());
         dispatch(gitContribution());
+        dispatch(currentUser())
+        dispatch(getProfile(userId));
     }, [dispatch]);
+
+    const reputations = user?.user?.reputation.map((rep) => rep.userId)
+    const isReputed = reputations?.includes(currentLoggedUser?.id);
+    
+    const [localIsReputed, setLocalIsReputed] = useState(isReputed);
+    const [localReputedCount, setLocalReputedCount] = useState(user?.user?.reputation.length ?? 0);
+
+    const isOwnProfile = String(currentLoggedUser?.id) === String(userId);
+
+    const handleReputation = async() => {
+        
+        if (isOwnProfile) return;
+
+        if (localIsReputed) {
+            setLocalReputedCount(localReputedCount - 1);
+        } else {
+            setLocalReputedCount(localReputedCount + 1);
+            console.log(localReputedCount)
+        }
+
+        setLocalIsReputed(!localIsReputed);
+        await dispatch(toggleReputation(userId));
+    }
 
     const AcceptedSubmissions = submissions?.filter(submission => submission.status === 'Accepted') || [];
 
@@ -112,22 +141,16 @@ export function ProfileDetails() {
         <div className="min-h-screen bg-[#0e1111] text-white p-6">
             <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-4 gap-6">
 
-                {/* Left Sidebar - Profile Info */}
                 <div className="lg:col-span-1 space-y-6">
-                    {/* Profile Card */}
                     <div className="bg-[#222222] rounded-2xl p-6 border border-gray-700">
                         <div className="flex items-center space-x-4 pb-4 border-b border-gray-700">
                             <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center">
                                 <User size={32} className="text-white" />
                             </div>
                             <div className="flex-1">
-                                <h2 className="text-xl font-bold mb-1">Your Name</h2>
-                                <p className="text-gray-400 mb-2">@username</p>
+                                <h2 className="text-xl font-bold mb-1">{user?.user?.name}</h2>
+                                <p className="text-gray-400 mb-2">@{user?.user?.name}</p>
                                 <div className="flex items-center justify-between">
-                                    <div className="flex items-center text-gray-400">
-                                        <MapPin size={14} className="mr-1" />
-                                        <span className="text-sm">Location</span>
-                                    </div>
                                     <button className="bg-blue-600 hover:bg-blue-700 text-white py-1 px-3 rounded-lg text-xs font-medium transition-colors">
                                         Edit Profile
                                     </button>
@@ -146,8 +169,7 @@ export function ProfileDetails() {
                                 {[
                                     { icon: Eye, label: 'Views', value: 0 },
                                     { icon: Code, label: 'Solutions', value: totalSolved },
-                                    { icon: MessageSquare, label: 'Discussions', value: 0 },
-                                    { icon: Star, label: 'Reputation', value: 0 }
+                                    { icon: MessageSquare, label: 'Discussions', value: 0 }
                                 ].map((stat, index) => (
                                     <div key={index} className="flex items-center space-x-2">
                                         <stat.icon size={16} className="text-gray-400" />
@@ -157,11 +179,33 @@ export function ProfileDetails() {
                                         </div>
                                     </div>
                                 ))}
+                                
+                                <div className="flex items-center space-x-2">
+                                    <button 
+                                        onClick={handleReputation}
+                                        disabled={isOwnProfile}
+                                        className={`${isOwnProfile ? 'cursor-not-allowed' : 'cursor-pointer hover:scale-110'} transition-transform`}
+                                    >
+                                        <Star 
+                                            size={16} 
+                                            className={`${
+                                                isOwnProfile 
+                                                    ? 'text-gray-400'
+                                                    : localIsReputed 
+                                                        ? 'text-yellow-400 fill-yellow-400'
+                                                        : 'text-gray-400 hover:text-yellow-400'
+                                            } transition-colors`}
+                                        />
+                                    </button>
+                                    <div>
+                                        <div className="text-sm font-medium text-white">{localReputedCount}</div>
+                                        <div className="text-xs text-gray-400">Reputation</div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    {/* Languages */}
                     <div className="bg-[#222222] rounded-2xl p-6 border border-gray-700">
                         <h3 className="text-lg font-semibold mb-4 flex items-center">
                             <Code size={20} className="mr-2 text-purple-400" />
@@ -183,10 +227,8 @@ export function ProfileDetails() {
                     </div>
                 </div>
 
-                {/* Main Content */}
                 <div className="lg:col-span-3 space-y-6">
 
-                    {/* Progress Stats */}
                     <div className="bg-[#222222] rounded-2xl p-6 border border-gray-700">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
 
@@ -276,7 +318,6 @@ export function ProfileDetails() {
                         </div>
                     </div>
 
-                    {/* Activity Contribution Graph */}
                     <div className="bg-[#222222] rounded-2xl p-6 border border-gray-700">
                         <div className="flex items-center justify-between mb-6">
                             <h3 className="text-lg font-semibold">Contribution Activity</h3>
@@ -320,16 +361,14 @@ export function ProfileDetails() {
                         </div>
 
                         <div className="flex justify-between items-center mt-6 text-sm text-gray-400">
-                            <span>{totalSubmissions} submissions in the past year</span>
+                            <span>{totalSubmissions} submissions in past year</span>
                             <div className="flex space-x-4">
-                                <span>Total active days: -</span>
-                                <span>Max streak: -</span>
-                                <span>Current streak: -</span>
+                                <span>Max streak - {user?.user?.maxStreak}</span>
+                                <span>Current streak - {user?.user?.streak}</span>
                             </div>
                         </div>
                     </div>
 
-                    {/* Recent Activity Tabs */}
                     <div className="bg-[#222222] rounded-2xl border border-gray-700">
                         <div className="flex border-b border-gray-700">
                             {[

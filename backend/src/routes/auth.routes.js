@@ -33,6 +33,6 @@ router.post("/forgot-password", validate(forgotPasswordSchema), forgotPassword)
 router.post("/reset-password/:token", validate(resetPasswordSchema), resetPassword)
 router.post("/update-profile", validate(updateProfileSchema), authMiddleware, updateProfile)
 router.get("/streak", authMiddleware, streakTrack)
-router.get("/user-profile", authMiddleware, userProfile)
+router.get("/user-profile/:userId", authMiddleware, userProfile)
 
 export default router
