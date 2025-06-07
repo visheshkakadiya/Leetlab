@@ -47,7 +47,7 @@ const Navbar = () => {
                 <NavLink
                     to="/problems"
                     className={({ isActive }) =>
-                        `text-white text-sm px-3 py-2 rounded-md transition-colors ${isActive ? 'bg-white/10 pointer-events-none' : 'hover:bg-white/10'
+                        `text-white text-sm px-3 py-2 rounded-md transition-colors ${isActive ? 'bg-white/10 pointer-events-none' : 'hover:bg-white/10 text-white/50'
                         }`
                     }
                 >

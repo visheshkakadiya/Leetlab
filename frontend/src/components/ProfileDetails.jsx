@@ -20,7 +20,7 @@ import { getUserPlaylists } from '../store/Slices/playlistSlice.js'
 import { useSelector, useDispatch } from 'react-redux';
 import { getAllSubmissions, gitContribution } from '../store/Slices/submissionsSlice.js';
 import { useParams, useNavigate } from 'react-router-dom';
-import {currentUser, getProfile} from '../store/Slices/authSlice.js';
+import { currentUser, getProfile } from '../store/Slices/authSlice.js';
 import { toggleReputation } from '../store/Slices/toggleSlice.js';
 import CalendarHeatmap from 'react-calendar-heatmap';
 import 'react-calendar-heatmap/dist/styles.css';
@@ -52,14 +52,14 @@ export function ProfileDetails() {
 
     const reputations = user?.user?.reputation.map((rep) => rep.userId)
     const isReputed = reputations?.includes(currentLoggedUser?.id);
-    
+
     const [localIsReputed, setLocalIsReputed] = useState(isReputed);
     const [localReputedCount, setLocalReputedCount] = useState(user?.user?.reputation.length ?? 0);
 
     const isOwnProfile = String(currentLoggedUser?.id) === String(userId);
 
-    const handleReputation = async() => {
-        
+    const handleReputation = async () => {
+
         if (isOwnProfile) return;
 
         if (localIsReputed) {
@@ -114,7 +114,7 @@ export function ProfileDetails() {
         { name: 'JavaScript', problems: uniqueJavascriptSolved.length, color: 'bg-yellow-500' },
         { name: 'Python', problems: uniquePythonSolved.length, color: 'bg-blue-500' },
         { name: 'Java', problems: uniqueJavaSolved.length, color: 'bg-red-500' }
-    ].filter(lang => lang.problems > 0);
+    ]
 
     const getDifficultyColor = (difficulty) => {
         switch (difficulty?.toUpperCase()) {
@@ -161,9 +161,9 @@ export function ProfileDetails() {
                         <div className="pt-4">
                             <div className="flex items-center justify-between mb-3">
                                 <h3 className="text-sm font-semibold text-blue-400">Community Stats</h3>
-                                <div className="bg-white/10 px-3 py-1 rounded-lg">
+                                {/* <div className="bg-white/10 px-3 py-1 rounded-lg">
                                     <span className="text-xs text-gray-300">Rank #-</span>
-                                </div>
+                                </div> */}
                             </div>
                             <div className="grid grid-cols-2 gap-3">
                                 {[
@@ -179,22 +179,21 @@ export function ProfileDetails() {
                                         </div>
                                     </div>
                                 ))}
-                                
+
                                 <div className="flex items-center space-x-2">
-                                    <button 
+                                    <button
                                         onClick={handleReputation}
                                         disabled={isOwnProfile}
                                         className={`${isOwnProfile ? 'cursor-not-allowed' : 'cursor-pointer hover:scale-110'} transition-transform`}
                                     >
-                                        <Star 
-                                            size={16} 
-                                            className={`${
-                                                isOwnProfile 
+                                        <Star
+                                            size={16}
+                                            className={`${isOwnProfile
                                                     ? 'text-gray-400'
-                                                    : localIsReputed 
+                                                    : localIsReputed
                                                         ? 'text-yellow-400 fill-yellow-400'
                                                         : 'text-gray-400 hover:text-yellow-400'
-                                            } transition-colors`}
+                                                } transition-colors`}
                                         />
                                     </button>
                                     <div>
@@ -212,17 +211,17 @@ export function ProfileDetails() {
                             Languages Used
                         </h3>
                         <div className="space-y-3">
-                            {languages.length > 0 ? languages.map((lang, index) => (
+                            {languages.map((lang, index) => (
                                 <div key={index} className="flex items-center justify-between">
                                     <div className="flex items-center">
                                         <div className={`w-3 h-3 rounded-full ${lang.color} mr-3`}></div>
                                         <span className="text-gray-300">{lang.name}</span>
                                     </div>
-                                    <span className="text-sm text-gray-400">{lang.problems} solved</span>
+                                    <span className="text-sm text-gray-400">
+                                        {lang.problems > 0 ? `${lang.problems} solved` : 0 }
+                                    </span>
                                 </div>
-                            )) : (
-                                <p className="text-gray-400 text-sm">No Solved yet</p>
-                            )}
+                            ))}
                         </div>
                     </div>
                 </div>

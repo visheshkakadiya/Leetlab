@@ -64,7 +64,6 @@ export const ProblemDetail = () => {
 
     const problem = useSelector((state) => state.problem?.problem);
     const problemLoading = useSelector((state) => state.problem.loading);
-    console.log(problem);
 
     const submitting = useSelector((state) => state.execute.executing);
     const running = useSelector((state) => state.execute.running);
@@ -239,7 +238,6 @@ export const ProblemDetail = () => {
                             </div>
                         </div>
 
-                        {/* Hints Accordion */}
                         {problem?.hints && problem.hints.length > 0 && (
                             <div className="mt-6">
                                 <Accordion
@@ -268,7 +266,7 @@ export const ProblemDetail = () => {
                                         <div className="flex items-center gap-2">
                                             <Lightbulb className="w-4 h-4 text-yellow-400" />
                                             <Typography sx={{ fontWeight: 'bold', fontSize: '16px' }}>
-                                                Hints ({problem.hints.length})
+                                                Hints 
                                             </Typography>
                                         </div>
                                     </AccordionSummary>
@@ -473,9 +471,7 @@ export const ProblemDetail = () => {
                 </div>
             </div>
 
-            {/* Main Content */}
             <div className="flex flex-1 overflow-hidden relative gap-2 mr-2">
-                {/* Left Panel - Problem Description */}
                 <div
                     className={`${isFullscreen ? "absolute top-0 left-0 w-full h-full z-50 bg-[#222222]" : "ml-2 mb-2 w-1/2"} 
                                 border border-gray-700 rounded-xl overflow-hidden flex flex-col transition-all duration-300`}
@@ -483,7 +479,6 @@ export const ProblemDetail = () => {
                     onMouseLeave={() => setIsHovered(false)}
                 >
                     <div className="bg-[#222222] border-b border-gray-700 flex items-center justify-between flex-shrink-0 rounded-t-xl px-2">
-                        {/* Tabs */}
                         <div className="flex">
                             {[
                                 ["description", "Description"],
@@ -504,7 +499,6 @@ export const ProblemDetail = () => {
                             ))}
                         </div>
 
-                        {/* Fullscreen Toggle Button */}
                         <div className="ml-auto pr-2 flex items-center">
                             {isHovered && !isFullscreen && (
                                 <button
@@ -531,7 +525,6 @@ export const ProblemDetail = () => {
                     </div>
                 </div>
 
-                {/* Right Panel */}
                 {!isFullscreen && (
                     <div className='w-1/2 flex flex-col h-full'>
                         <div className="bg-[#222222] border border-gray-700 rounded-t-lg flex items-center justify-between px-4 py-2 flex-shrink-0">

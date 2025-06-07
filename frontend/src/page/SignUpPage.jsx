@@ -49,15 +49,6 @@ export default function SignupForm() {
       <div className="w-[90%] max-w-lg rounded-lg bg-[#121c2c]/80 p-8 shadow-xl backdrop-blur-md">
         <h1 className="mb-6 text-center text-2xl font-semibold">Register with</h1>
 
-        <div className="mb-6 flex justify-center gap-4">
-          <button className="flex h-12 w-20 items-center justify-center rounded-md border border-gray-600 bg-transparent">
-            <Facebook className="h-6 w-6 text-[#1877F2]" />
-          </button>
-          <button className="flex h-12 w-20 items-center justify-center rounded-md border border-gray-600 bg-transparent">
-            <Apple className="h-6 w-6 text-white" />
-          </button>
-        </div>
-
         <div className="mb-6 flex items-center justify-center">
           <span className="text-gray-400">or</span>
         </div>

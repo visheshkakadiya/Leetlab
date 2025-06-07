@@ -7,7 +7,6 @@ export default function HomePage() {
   const navigate = useNavigate();
   return (
     <div className="min-h-screen bg-[#0e1111] text-white">
-      {/* Hero Section */}
       <section className="py-20 px-4 sm:px-6 lg:px-8">
         <div className="container mx-auto text-center">
           <div className="max-w-4xl mx-auto">
@@ -36,7 +35,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Stats Section */}
       <section className="py-16 px-4 sm:px-6 lg:px-8 bg-[#1a1d1f]">
         <div className="container mx-auto">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
@@ -53,25 +51,23 @@ export default function HomePage() {
               <div className="text-gray-400">Companies</div>
             </div>
             <div>
-              <div className="text-3xl font-bold text-orange-400 mb-2">10+</div>
+              <div className="text-3xl font-bold text-orange-400 mb-2">5+</div>
               <div className="text-gray-400">Languages</div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Features Section */}
       <section className="py-20 px-4 sm:px-6 lg:px-8">
         <div className="container mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4">Why Choose CodeMaster?</h2>
+            <h2 className="text-4xl font-bold mb-4">Why Choose NexCode?</h2>
             <p className="text-xl text-gray-400 max-w-2xl mx-auto">
               Everything you need to ace your coding interviews and become a better programmer
             </p>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {/* Feature Cards */}
             {[
               { icon: <Code className="h-12 w-12 text-emerald-400 mb-4" />, title: "Diverse Problem Set", desc: "From easy to hard, covering all major algorithms and data structures" },
               { icon: <Trophy className="h-12 w-12 text-yellow-400 mb-4" />, title: "Weekly Contests", desc: "Compete with developers worldwide and climb the leaderboard" },
@@ -90,7 +86,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* CTA Section */}
       <section className="py-20 px-4 sm:px-6 lg:px-8 bg-[#0e1111]">
         <div className="container mx-auto text-center">
           <h2 className="text-4xl font-bold mb-6">Ready to Level Up?</h2>
@@ -98,7 +93,9 @@ export default function HomePage() {
             Join thousands of developers who have improved their coding skills and landed their dream jobs
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button className="bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-3 rounded-lg text-lg">
+            <button className="bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-3 rounded-lg text-lg"
+              onClick={() => navigate("/problems")}
+            >
               Get Started Free
             </button>
             <button className="border border-gray-600 text-gray-300 hover:bg-white/10 px-8 py-3 rounded-lg text-lg">
@@ -108,14 +105,13 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Footer */}
       <footer className="bg-[#0e1111] border-t border-gray-800 py-12 px-4 sm:px-6 lg:px-8">
         <div className="container mx-auto">
           <div className="grid md:grid-cols-4 gap-8">
             <div>
               <div className="flex items-center space-x-2 mb-4">
                 <Code className="h-6 w-6 text-emerald-400" />
-                <span className="text-lg font-bold">CodeMaster</span>
+                <span className="text-lg font-bold">NexCode</span>
               </div>
               <p className="text-gray-400">
                 The best platform to help you enhance your skills and ace coding interviews.
@@ -150,7 +146,7 @@ export default function HomePage() {
             ))}
           </div>
           <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-            <p>&copy; {new Date().getFullYear()} CodeMaster. All rights reserved.</p>
+            <p>&copy; {new Date().getFullYear()} NexCode. All rights reserved.</p>
           </div>
         </div>
       </footer>
