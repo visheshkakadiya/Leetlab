@@ -1,1 +1,1 @@
-export const BASE_URL = import.meta.env.VITE_BACKEND_URL || "https://leetlab-l889.onrender.com";
+export const BASE_URL = import.meta.env.VITE_BACKEND_URL;
