@@ -21,7 +21,6 @@ export const AddToPlaylistPopup = ({ isOpen, onClose, problemId, currentPlaylist
         }
     }, [isOpen, dispatch]);
 
-    // Filter out current playlist
     const availablePlaylists = ownPlaylists.filter(playlist => playlist.id !== currentPlaylistId);
 
     const handleAddToPlatlist = async () => {
@@ -34,10 +33,8 @@ export const AddToPlaylistPopup = ({ isOpen, onClose, problemId, currentPlaylist
         setError('');
 
         try {
-            // Find the selected playlist
             const playlist = ownPlaylists.find(p => p.id === selectedPlaylist);
 
-            // Check if problem already exists in the selected playlist
             const problemExists = playlist?.problems?.some(p => p.problemId === problemId);
 
             if (problemExists) {
@@ -46,10 +43,8 @@ export const AddToPlaylistPopup = ({ isOpen, onClose, problemId, currentPlaylist
                 return;
             }
 
-            // Call the onAdd function passed from parent component
             await onAdd(selectedPlaylist, problemId);
 
-            // Close popup on success
             onClose();
         } catch (err) {
             setError(err.message || 'Failed to add problem to playlist');
@@ -63,7 +58,6 @@ export const AddToPlaylistPopup = ({ isOpen, onClose, problemId, currentPlaylist
     return (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
             <div className="bg-[#222222] rounded-xl border border-slate-700 w-full max-w-md">
-                {/* Header */}
                 <div className="flex items-center justify-between p-6 border-b border-slate-800">
                     <h2 className="text-lg font-semibold text-slate-100">Add to Playlist</h2>
                     <button
@@ -74,7 +68,6 @@ export const AddToPlaylistPopup = ({ isOpen, onClose, problemId, currentPlaylist
                     </button>
                 </div>
 
-                {/* Dropdown Selection */}
                 <div className="p-6">
                     <label className="block text-sm font-medium text-slate-300 mb-2">
                         Select Playlist
@@ -101,7 +94,6 @@ export const AddToPlaylistPopup = ({ isOpen, onClose, problemId, currentPlaylist
                     )}
                 </div>
 
-                {/* Error Message */}
                 {error && (
                     <div className="px-6 pb-2">
                         <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-3">
@@ -110,7 +102,6 @@ export const AddToPlaylistPopup = ({ isOpen, onClose, problemId, currentPlaylist
                     </div>
                 )}
 
-                {/* Footer */}
                 <div className="flex items-center justify-end space-x-3 p-6 border-t border-slate-800">
                     <button
                         onClick={onClose}

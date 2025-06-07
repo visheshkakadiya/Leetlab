@@ -202,7 +202,7 @@ export const PlaylistDetail = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-950 flex items-center justify-center">
+      <div className="min-h-screen bg-[#222222] flex items-center justify-center">
         <div className="text-slate-100">Loading...</div>
       </div>
     );
@@ -543,7 +543,6 @@ export const PlaylistDetail = () => {
         </div>
       </div>
 
-      {/* Edit Playlist Modal - Only for playlist owner */}
       {isOwner && isEditModalOpen && (
         <EditPlaylist
           playlist={playlist}
@@ -552,7 +551,6 @@ export const PlaylistDetail = () => {
         />
       )}
 
-      {/* Add to Playlist Popup - Only for logged in users */}
       {user && (
         <AddToPlaylistPopup
           isOpen={addToPlaylistOpen}

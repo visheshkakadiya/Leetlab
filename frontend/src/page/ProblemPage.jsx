@@ -34,7 +34,7 @@ const ProbemPage = () => {
                     </p>
                 </div>
                 <div className="hidden md:block bg-primary text-black font-semibold px-4 py-2 rounded-lg shadow hover:brightness-110 transition">
-                    LeetLab 🚀
+                    NexCode 🚀
                 </div>
             </div>
 

@@ -121,7 +121,7 @@ export default function LoginPage() {
       {/* Right Panel */}
       <div className="hidden lg:flex lg:w-1/2 items-center justify-center bg-gray-800">
         <div className="max-w-lg text-center px-6">
-          <h2 className="text-3xl font-bold text-white">Welcome to LeetLab</h2>
+          <h2 className="text-3xl font-bold text-white">Welcome to NexCode</h2>
           <p className="mt-4 text-sm text-gray-400">
             Your personal coding lab to practice, compete, and grow.
             Sharpen your problem-solving skills with real-world coding challenges, track your progress, and get ready for interviews.
