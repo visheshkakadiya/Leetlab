@@ -44,6 +44,7 @@ export const getAllProblems = createAsyncThunk("getAllProblems", async () => {
         const response = await axiosInstance.get("/problems/get-allProblems")
         return response.data.data
     } catch (error) {
+        console.log(error)
         throw error
     }
 })
