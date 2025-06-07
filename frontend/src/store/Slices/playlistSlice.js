@@ -161,7 +161,7 @@ const playlistSlice = createSlice({
             })
             .addCase(getOwnPlaylists.fulfilled, (state, action) => {
                 state.loading = false
-                state.playlists = action.payload
+                state.playlists = Array.isArray(action.payload) ? action.payload : []
             })
             .addCase(getPlaylistById.fulfilled, (state, action) => {
                 state.playlist = action.payload
