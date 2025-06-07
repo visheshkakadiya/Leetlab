@@ -318,11 +318,12 @@ const config = {
     "db"
   ],
   "activeProvider": "postgresql",
+  "postinstall": false,
   "inlineDatasources": {
     "db": {
       "url": {
         "fromEnvVar": "DATABASE_URL",
-        "value": "postgresql://leetlab_owner:npg_nxdSV2oy4jev@ep-patient-flower-a107hmeg-pooler.ap-southeast-1.aws.neon.tech/leetlab?sslmode=require"
+        "value": null
       }
     }
   },
