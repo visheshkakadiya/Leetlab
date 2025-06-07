@@ -19,7 +19,7 @@ export const createProblem = createAsyncThunk("createProblem", async ({name, des
     }
 })
 
-export const updateProblem = createAsyncThunk("updateProblem", async (data, problemId) => {
+export const updateProblem = createAsyncThunk("updateProblem", async ({data, problemId}) => {
     try {
         const response = await axiosInstance.put(`/problems/update-problem/${problemId}`, data)
         toast.success("Problem updated")
