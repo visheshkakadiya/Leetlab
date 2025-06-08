@@ -6,6 +6,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faUser, faRightFromBracket, faPlus } from '@fortawesome/free-solid-svg-icons'
 import { getStreak, logoutUser } from '../store/Slices/authSlice.js';
 import { Flame } from 'lucide-react'
+import { userProfile } from '../../../backend/src/controllers/auth.controller.js'
 
 const Navbar = () => {
     const dispatch = useDispatch()
@@ -13,11 +14,12 @@ const Navbar = () => {
     const authUser = useSelector((state) => state.auth?.status)
     const userId = useSelector((state) => state.auth?.user?.id)
     const avatar = useSelector((state) => state.auth?.user?.avatar?.url)
-    const user = useSelector((state) => state.auth?.user)
+    const user = useSelector((state) => state.auth?.userData)
     const streak = useSelector((state) => state.auth?.streak)
     const [toggleMenu, setToggleMenu] = useState(false)
 
     useEffect(() => {
+        dispatch(userProfile(userId))
         dispatch(getStreak())
     }, [dispatch])
 
@@ -62,7 +64,7 @@ const Navbar = () => {
                         {streak && (
                             <div className='flex flex-row gap-1 mr-2'>
                                 <span><Flame size={20} className='mt-2 text-yellow-400' /></span>
-                                <span className='font-bold text-white mt-1.5'>{streak.streak}</span>
+                                <span className='font-bold text-white mt-1.5'>{user?.user?.streak}</span>
                             </div>
                         )}
                         <img
@@ -75,7 +77,7 @@ const Navbar = () => {
 
                     {toggleMenu && (
                         <div className='absolute right-0 mt-2 w-40 bg-base-200 shadow-md rounded-md text-sm z-50'>
-                            {user?.role === 'ADMIN' && (
+                            {user?.user?.role === 'ADMIN' && (
                                 <Link
                                     to='/create-problem'
                                     className='flex items-center gap-2 px-4 py-2 text-slate-200 hover:bg-white/10 border-t border-gray-200 hover:cursor-pointer'
