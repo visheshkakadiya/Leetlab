@@ -51,9 +51,9 @@ export const getSubmissionById = createAsyncThunk("getSubmissionById", async (su
     }
 })
 
-export const gitContribution = createAsyncThunk("gitContribution", async () => {
+export const gitContribution = createAsyncThunk("gitContribution", async (userId) => {
     try {
-        const response = await axiosInstance.get(`/submission/git-contribution`)
+        const response = await axiosInstance.get(`/submission/git-contribution/${userId}`)
         return response.data.data;
     } catch (error) {
         toast.error(error.response?.data?.message || "No Submissions found")

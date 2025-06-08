@@ -128,7 +128,7 @@ const getSubmissionById = asyncHandler(async (req, res) => {
 
 const gitContribution = asyncHandler(async (req, res) => {
 
-    const userId = req.user.Id
+    const userId = req.params
 
     const results = await db.submission.groupBy({
         by: ["createdAt"],

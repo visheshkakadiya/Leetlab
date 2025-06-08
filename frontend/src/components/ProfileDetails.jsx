@@ -1,17 +1,10 @@
 import React, { use, useEffect, useState } from 'react';
 import {
     User,
-    MapPin,
-    Calendar,
-    Trophy,
     Code,
     Eye,
     MessageSquare,
     Star,
-    TrendingUp,
-    Award,
-    GitBranch,
-    Zap,
     ScrollText,
     BookCheck
 } from 'lucide-react';
@@ -45,7 +38,7 @@ export function ProfileDetails() {
         dispatch(getAllProblems());
         dispatch(getUserPlaylists(userId));
         dispatch(getAllSubmissions());
-        dispatch(gitContribution());
+        dispatch(gitContribution(userId));
         dispatch(currentUser())
         dispatch(getProfile(userId));
     }, [dispatch]);

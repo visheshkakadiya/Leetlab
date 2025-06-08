@@ -14,6 +14,6 @@ router.get('/get-all-submissions', authMiddleware, getAllSubmission);
 router.get('/get-submission/:problemId', authMiddleware, getSubmissionsForProblem);
 router.post('/get-submissions-count', authMiddleware, totalSubmissionsForProblem);
 router.get('/get-submission-details/:submissionId', authMiddleware, getSubmissionById);
-router.get('/git-contribution', authMiddleware, gitContribution);
+router.get('/git-contribution/:userId', authMiddleware, gitContribution);
 
 export default router;
