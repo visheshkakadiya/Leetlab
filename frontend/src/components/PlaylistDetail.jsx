@@ -32,6 +32,7 @@ import { currentUser } from '../store/Slices/authSlice.js';
 import { useMemo } from 'react';
 import { EditPlaylist } from './EditPlaylist.jsx';
 import { AddToPlaylistPopup } from './AddToPlaylistPopup.jsx';
+import LoaderDefault from './LoaderDefault.jsx';
 
 export const PlaylistDetail = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -48,7 +49,9 @@ export const PlaylistDetail = () => {
 
   const loading = useSelector((state) => state.playlist?.loading);
   const playlist = useSelector((state) => state.playlist?.playlist);
+  console.log("playlist", playlist);
   const user = useSelector((state) => state.auth?.user);
+  console.log("user", user?.id);
 
   const isOwner = user?.id === playlist?.userId;
 
@@ -203,7 +206,7 @@ export const PlaylistDetail = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-[#222222] flex items-center justify-center">
-        <div className="text-slate-100">Loading...</div>
+        <LoaderDefault />
       </div>
     );
   }
@@ -458,6 +461,8 @@ export const PlaylistDetail = () => {
                   <tbody>
                     {filteredProblems.map((problemData, index) => {
                       const problem = problemData.problem;
+                      console.log("problem", problem);
+                      console.log("problemSolved", problem?.solvedBy);
                       const isSolved = problem?.solvedBy?.some(entry => entry?.problem?.userId === user?.id);
 
                       return (

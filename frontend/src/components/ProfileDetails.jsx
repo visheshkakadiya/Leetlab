@@ -17,6 +17,7 @@ import { currentUser, getProfile } from '../store/Slices/authSlice.js';
 import { toggleReputation } from '../store/Slices/toggleSlice.js';
 import CalendarHeatmap from 'react-calendar-heatmap';
 import 'react-calendar-heatmap/dist/styles.css';
+import LoaderDefault from './LoaderDefault.jsx';
 
 export function ProfileDetails() {
     const dispatch = useDispatch();
@@ -30,6 +31,7 @@ export function ProfileDetails() {
     const contribution = useSelector((state) => state.submissions?.contribution);
     const currentLoggedUser = useSelector((state) => state.auth?.user);
     const user = useSelector((state) => state.auth?.userData);
+    const loading = useSelector((state) => state.auth?.isLoading);
 
     const today = new Date();
     const oneYearAgo = new Date().setFullYear(today.getFullYear() - 1);
@@ -129,6 +131,14 @@ export function ProfileDetails() {
             return dateString;
         }
     };
+
+    if (loading) {
+        return (
+            <div className="flex items-center justify-center h-screen">
+                <LoaderDefault />
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen bg-[#0e1111] text-white p-6">

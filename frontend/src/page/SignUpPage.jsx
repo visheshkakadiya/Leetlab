@@ -6,6 +6,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
 import { registerUser, loginUser } from "../store/Slices/authSlice.js";
+import { GoogleLogin } from "@react-oauth/google";
+import { googleLogin } from "../store/Slices/authSlice.js";
 
 export default function SignupForm() {
   const {
@@ -49,12 +51,32 @@ export default function SignupForm() {
       <div className="w-[90%] max-w-lg rounded-lg bg-[#121c2c]/80 p-8 shadow-xl backdrop-blur-md">
         <h1 className="mb-6 text-center text-2xl font-semibold">Register with</h1>
 
-        <div className="mb-6 flex items-center justify-center">
-          <span className="text-gray-400">or</span>
+        <div className="mt-4 flex justify-center">
+          <GoogleLogin
+            theme="filled_blue"
+            onSuccess={(credentialResponse) => {
+              dispatch(googleLogin(credentialResponse))
+
+              setTimeout(() => {
+                navigate("/problems");
+              }, 2000);
+            }}
+            onError={() => {
+              console.log("Login Failed");
+            }}
+          />
         </div>
 
+        <div className="relative mt-6 mb-6">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-gray-700" />
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="bg-gray-900 px-2 text-gray-400">Or With</span>
+            </div>
+          </div>
+
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          {/* Name */}
           <div className="flex flex-col gap-1">
             <div className="relative">
               <User className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
@@ -69,7 +91,6 @@ export default function SignupForm() {
             {errors.name && <span className="ml-1 text-sm text-red-500">{errors.name.message}</span>}
           </div>
 
-          {/* Email */}
           <div className="flex flex-col gap-1">
             <div className="relative">
               <Mail className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
@@ -84,7 +105,6 @@ export default function SignupForm() {
             {errors.email && <span className="ml-1 text-sm text-red-500">{errors.email.message}</span>}
           </div>
 
-          {/* Password */}
           <div className="flex flex-col gap-1">
             <div className="relative">
               <Lock className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
@@ -106,7 +126,6 @@ export default function SignupForm() {
             {errors.password && <span className="ml-1 text-sm text-red-500">{errors.password.message}</span>}
           </div>
 
-          {/* Submit */}
           <button
             type="submit"
             className="mt-2 w-full rounded-md bg-[#3b82f6] py-2 text-base font-semibold uppercase text-white hover:bg-[#2563eb]"

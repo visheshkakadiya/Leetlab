@@ -1,15 +1,22 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Mail, Lock } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { LoginSchema } from "../schemas/authValidate.js";
 import { useSelector, useDispatch } from "react-redux";
-import { loginUser, currentUser } from "../store/Slices/authSlice.js";
+import { loginUser, currentUser, googleLogin } from "../store/Slices/authSlice.js";
+import { GoogleLogin } from '@react-oauth/google';
+import { Eye, EyeOff } from "lucide-react";
+import { useState } from "react";
+import toast from "react-hot-toast";
+import LoaderDefault from "../components/LoaderDefault.jsx";
 
 export default function LoginPage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const loading = useSelector((state) => state.auth?.isLoading);
+
+  const [showPassword, setShowPassword] = useState(false);
 
   const {
     register,
@@ -24,14 +31,14 @@ export default function LoginPage() {
     const user = await dispatch(currentUser());
 
     if (user && login?.payload) {
-      navigate("/");
+      navigate("/problems");
     }
   };
 
   if (loading) {
     return (
-      <div className="flex h-screen w-screen bg-gray-900 text-white items-center justify-center">
-        <h1 className="text-2xl font-semibold">Loading...</h1>
+      <div className="flex items-center justify-center h-screen">
+        <LoaderDefault />
       </div>
     );
   }
@@ -46,7 +53,6 @@ export default function LoginPage() {
           </div>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-            {/* Email Input */}
             <div className="space-y-2">
               <label htmlFor="email" className="block text-sm font-medium text-gray-300">
                 Email
@@ -66,7 +72,6 @@ export default function LoginPage() {
               {errors.email && <p className="text-sm text-red-500">{errors.email.message}</p>}
             </div>
 
-            {/* Password Input */}
             <div className="space-y-2">
               <label htmlFor="password" className="block text-sm font-medium text-gray-300">
                 Password
@@ -76,12 +81,19 @@ export default function LoginPage() {
                   <Lock className="h-5 w-5 text-gray-400" />
                 </div>
                 <input
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   placeholder="Enter your Password"
                   {...register("password")}
                   className={`block w-full rounded-md bg-gray-800 text-white border ${errors.password ? "border-red-500" : "border-gray-700"
                     } py-2 pl-10 pr-3 placeholder-gray-400 focus:border-blue-500 focus:outline-none focus:ring-blue-500`}
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
               </div>
               {errors.password && <p className="text-sm text-red-500">{errors.password.message}</p>}
             </div>
@@ -107,6 +119,28 @@ export default function LoginPage() {
             <div className="relative flex justify-center text-sm">
               <span className="bg-gray-900 px-2 text-gray-400">Or With</span>
             </div>
+          </div>
+
+          <div className="mt-4 flex justify-center">
+            <GoogleLogin
+              theme="filled_blue"
+              onSuccess={(credentialResponse) => {
+                dispatch(googleLogin(credentialResponse))
+                  .unwrap()
+                  .then(() => {
+                    setTimeout(() => {
+                      navigate("/problems");
+                    }, 2000);
+                  })
+                  .catch((error) => {
+                    console.error("Google login error:", error);
+                    toast.error("Login failed");
+                  });
+              }}
+              onError={() => {
+                toast.error("Login with Google Failed");
+              }}
+            />
           </div>
 
           <div className="text-center text-sm text-gray-400">

@@ -16,6 +16,9 @@ import { PlaylistDetail } from './components/PlaylistDetail.jsx'
 import PlaylistLayout from './Layout/PlaylistLayout.jsx'
 import { ProfileDetails } from './components/ProfileDetails.jsx'
 import AdminRoute from './components/AdminRoute.jsx'
+import ComplexityModel from './components/ComplexityModel.jsx'
+import AiChatModel from './components/AiChatModel.jsx'
+import Loader from './components/Testing2.jsx'
 
 const App = () => {
 
@@ -66,6 +69,10 @@ const App = () => {
               <LoginPage />
             </AuthLayout>
           }
+        />
+        <Route
+          path='/testing'
+          element={<Loader />}
         />
         <Route
           path='/signup'

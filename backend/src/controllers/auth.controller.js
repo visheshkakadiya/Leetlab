@@ -13,6 +13,7 @@ import ApiError from "../utils/ApiError.js";
 import ApiResponse from "../utils/ApiResponse.js";
 import { forgotPasswordGenContent, sendMail } from "../utils/mail.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
+import { verifyGoogleToken } from "../utils/verifyGoogleToken.js";
 
 const generateAccessAndRefreshToken = async (userId) => {
     try {
@@ -116,10 +117,10 @@ const login = asyncHandler(async (req, res) => {
     );
 
     const options = {
-       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     };
 
     res
@@ -153,9 +154,9 @@ const logout = asyncHandler(async (req, res) => {
 
     const options = {
         httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+        secure: process.env.NODE_ENV === "production",
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     };
 
     res
@@ -168,14 +169,37 @@ const logout = asyncHandler(async (req, res) => {
 });
 
 const currentUser = asyncHandler(async (req, res) => {
+
+    const userId = req.user?.id;
+
+    if (!userId) {
+        throw new ApiError(401, "Unauthorized, please login again");
+    }
+
+    const user = await db.user.findUnique({
+        where: {
+            id: userId,
+        },
+        select: {
+            id: true,
+            name: true,
+            email: true,
+            imageUrl: true,
+            role: true,
+        }
+    });
+
+    if (!user) {
+        throw new ApiError(404, "User not found");
+    }
+
     res.status(200).json(
-        new ApiResponse(200, req.user, "User logged in successfully")
+        new ApiResponse(200, user, "Current User Data Fetched Successfully")
     );
 });
 
 const refreshAccessToken = asyncHandler(async (req, res) => {
-    const incomingRefreshToken =
-        req.cookies.refreshToken || req.body.refreshToken;
+    const incomingRefreshToken = req.cookies.refreshToken;
 
     if (!incomingRefreshToken) {
         throw new ApiError(401, "Unauthorized, please login again");
@@ -195,18 +219,20 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
         throw new ApiError(401, "Token expired, please login again");
     }
 
-    const { accessToken, newRefreshToken } = await generateAccessAndRefreshToken(
+    if (user.refreshToken !== incomingRefreshToken) {
+        throw new ApiError(401, "Refresh Token expired");
+    }
+
+    const { accessToken, refreshToken: newRefreshToken } = await generateAccessAndRefreshToken(
         user.id
     );
 
     const options = {
         httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+        secure: process.env.NODE_ENV === "production",
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     };
-    res.cookie("accessToken", accessToken, options);
-    res.cookie("refreshToken", newRefreshToken, options);
 
     await db.user.update({
         where: {
@@ -219,6 +245,8 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
 
     return res
         .status(200)
+        .cookie("accessToken", accessToken, options)
+        .cookie("refreshToken", newRefreshToken, options)
         .json(new ApiResponse(200, null, "Access token refreshed successfully"));
 });
 
@@ -341,7 +369,7 @@ const updateProfile = asyncHandler(async (req, res) => {
 
 const userProfile = asyncHandler(async (req, res) => {
 
-    const {userId} = req.params;
+    const { userId } = req.params;
     const user = await db.user.findUnique({
         where: {
             id: userId,
@@ -358,6 +386,53 @@ const userProfile = asyncHandler(async (req, res) => {
     return res
         .status(200)
         .json(new ApiResponse(200, { user }, "User profile fetched successfully"));
+})
+
+const googleLogin = asyncHandler(async (req, res) => {
+    const { credential } = req.body;
+    const payload = await verifyGoogleToken(credential)
+
+    const { email, name, picture, email_verified } = payload;
+
+    if (!email || !name || !picture || !email_verified) {
+        throw new ApiError(400, "Invalid Google Token")
+    }
+
+    const existingUser = await db.user.findUnique({
+        where: {
+            email,
+        },
+    });
+
+    let user = existingUser;
+
+    if (!user) {
+        user = await db.user.create({
+            data: {
+                email,
+                imageUrl: picture,
+                name,
+                isVerified: email_verified,
+            }
+        })
+    }
+
+    const { accessToken, refreshToken } = await generateAccessAndRefreshToken(user.id);
+
+    const options = {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+        maxAge: 24 * 60 * 60 * 1000,
+    }
+
+    res
+        .status(200)
+        .cookie("accessToken", accessToken, options)
+        .cookie("refreshToken", refreshToken, options)
+        .json(
+            new ApiResponse(200, null, "User logged in successfully")
+        )
 })
 
 const streakTrack = asyncHandler(async (req, res) => {
@@ -390,15 +465,15 @@ const streakTrack = asyncHandler(async (req, res) => {
     // console.log("Unique days: ", uniqueDays)
 
     const mostRecentDate = new Date(uniqueDays[0]);
-    
+
     for (let i = 0; i < uniqueDays.length; i++) {
 
         const expectedDate = new Date(mostRecentDate);
         expectedDate.setDate(expectedDate.getDate() - i);
         const expectedDateString = expectedDate.toISOString().split("T")[0];
-        
+
         // console.log("Expected date: ", expectedDateString)
-        
+
         if (uniqueDays.includes(expectedDateString)) {
             streak++;
             maxStreak = Math.max(maxStreak, streak);
@@ -448,5 +523,6 @@ export {
     resetPassword,
     updateProfile,
     streakTrack,
-    userProfile
+    userProfile,
+    googleLogin
 };

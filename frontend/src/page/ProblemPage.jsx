@@ -3,6 +3,7 @@ import { getAllProblems } from "../store/Slices/problemSlice.js";
 import { Loader } from "lucide-react";
 import ProblemsTable from "../components/Problems.jsx";
 import { useSelector, useDispatch } from "react-redux";
+import LoaderDefault from "../components/LoaderDefault.jsx";
 
 const ProbemPage = () => {
     const dispatch = useDispatch();
@@ -16,7 +17,7 @@ const ProbemPage = () => {
     if (loading) {
         return (
             <div className="flex items-center justify-center h-screen">
-                <Loader className="size-10 animate-spin text-primary" />
+                <LoaderDefault />
             </div>
         );
     }

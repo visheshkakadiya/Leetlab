@@ -1,7 +1,11 @@
-import { Clock, Cpu, TrendingUp, User, Loader2 } from "lucide-react";
+import { Clock, Cpu, TrendingUp, User, Loader2, Sparkles } from "lucide-react";
 import { BarChart } from "@mui/x-charts/BarChart";
+import ComplexityModal from "./ComplexityModel";
+import { useState } from "react";
 
 export function Submission({ submission }) {
+
+  const [showComplexity, setShowComplexity] = useState(false);
 
   if (!submission) {
     return <div className="flex items-center justify-center h-full">
@@ -48,6 +52,20 @@ export function Submission({ submission }) {
   const avgTime = calculateAverageTime(submission.time);
   const avgMemory = calculateAverageMemory(submission.memory);
 
+  const handleComplexity = () => {
+    setShowComplexity(true);
+  }
+
+  const handleCloseComplexity = () => {
+    setShowComplexity(false);
+  }
+
+  if (showComplexity) {
+    return (
+      <ComplexityModal onClose={handleCloseComplexity} sourceCode={submission.sourceCode} />
+    )
+  }
+
   return (
     <div className="h-full w-full overflow-y-auto overflow-x-hidden">
       <div className="min-h-screen bg-[#222222] p-4">
@@ -82,6 +100,17 @@ export function Submission({ submission }) {
                 {submission.user.name} • Submitted on{" "}
                 {new Date(submission.createdAt).toLocaleDateString()} - {submission.language}
               </span>
+              {submission.status === "Accepted" && (
+                <span className="ml-auto flex items-center gap-1 hover:cursor-pointer text-base font-medium"
+                  onClick={handleComplexity}
+                >
+                  <Sparkles className="w-5 h-5 text-purple-500" />
+                  <span className="bg-gradient-to-r from-indigo-400 to-fuchsia-500 text-transparent bg-clip-text">
+                    Analyze Complexity
+                  </span>
+                </span>
+              )}
+
             </div>
           </div>
 

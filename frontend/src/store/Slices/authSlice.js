@@ -34,7 +34,7 @@ export const loginUser = createAsyncThunk("login", async (data) => {
 
 export const logoutUser = createAsyncThunk("logout", async () => {
     try {
-        const response = await axiosInstance.post("/auth/logout");
+        const response = await axiosInstance.post("/auth/logout", {}, {withCredentials: true});
         toast.success("logged out");
         return response.data;
     } catch (error) {
@@ -59,7 +59,7 @@ export const currentUser = createAsyncThunk("currentUser", async () => {
 
 export const forgotPassword = createAsyncThunk("forgotPassword", async (email) => {
     try {
-        const response = await axiosInstance.post("auth/forgot-password", { email });
+        const response = await axiosInstance.post("/auth/forgot-password", { email });
         toast.success("Password reset link sent to your email");
         return response.data;
     } catch (error) {
@@ -69,7 +69,7 @@ export const forgotPassword = createAsyncThunk("forgotPassword", async (email) =
 
 export const resetPassword = createAsyncThunk("resetPassword", async ({ token, newPassword }) => {
     try {
-        const response = await axiosInstance.post(`auth/reset-password/${token}`, { newPassword });
+        const response = await axiosInstance.post(`/auth/reset-password/${token}`, { newPassword });
         toast.success("Password reset successfully");
         return response.data;
     } catch (error) {
@@ -105,6 +105,17 @@ export const getProfile = createAsyncThunk("getProfile", async (userId) => {
     }
 })
 
+export const googleLogin = createAsyncThunk("googleLogin", async (userData) => {
+    try {
+        const response = await axiosInstance.post("/auth/google-auth", userData, {withCredentials: true})
+        toast.success("login successfull")
+        return response.data.data
+    } catch (error) {
+        toast.error("fail to login")
+        throw error        
+    }
+})
+
 const authSlice = createSlice({
     name: "auth",
     initialState,
@@ -122,6 +133,14 @@ const authSlice = createSlice({
             .addCase(registerUser.rejected, (state, action) => {
                 state.isLoading = false;
                 state.error = action.error.message;
+            })
+            .addCase(googleLogin.pending, (state) => {
+                state.isLoading = true;
+            })
+            .addCase(googleLogin.fulfilled, (state, action) => {
+                state.isLoading = false;
+                state.status = true;
+                state.user = action.payload;
             })
             .addCase(loginUser.pending, (state) => {
                 state.isLoading = true;

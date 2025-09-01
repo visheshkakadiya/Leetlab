@@ -9,7 +9,8 @@ import {
     forgotPassword,
     updateProfile,
     streakTrack,
-    userProfile
+    userProfile,
+    googleLogin
 } from "../controllers/auth.controller.js";
 import { authMiddleware } from '../middlewares/auth.middleware.js'
 import { upload } from "../middlewares/multer.middleware.js"
@@ -34,5 +35,6 @@ router.post("/reset-password/:token", validate(resetPasswordSchema), resetPasswo
 router.post("/update-profile", validate(updateProfileSchema), authMiddleware, updateProfile)
 router.get("/streak", authMiddleware, streakTrack)
 router.get("/user-profile/:userId", authMiddleware, userProfile)
+router.post("/google-auth", googleLogin)
 
 export default router

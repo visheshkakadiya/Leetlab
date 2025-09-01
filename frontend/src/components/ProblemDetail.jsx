@@ -30,10 +30,11 @@ import { Submission } from "../components/Submission.jsx";
 import SubmissionsList from "../components/SubmissionList.jsx";
 import { useNavigate } from 'react-router-dom';
 import Accordion from '@mui/material/Accordion';
-import AccordionActions from '@mui/material/AccordionActions';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import Typography from '@mui/material/Typography';
+import AiChatModel from './AiChatModel.jsx';
+import LoaderDefault from './LoaderDefault.jsx';
 
 const CodeEditor = React.memo(({ code, setCode, selectedLanguage }) => {
     return (
@@ -88,6 +89,7 @@ export const ProblemDetail = () => {
     const [activeCase, setActiveCase] = useState(0);
     const [testTab, setTestTab] = useState("testCase");
     const [editorialTab, setEditorialTab] = useState("editorial");
+    const [aiModelOpen, setAiModelOpen] = useState(false);
 
     useEffect(() => {
         if (id) {
@@ -159,6 +161,10 @@ export const ProblemDetail = () => {
         }
     };
 
+    const handleChatModelOpen = () => {
+        setAiModelOpen((prev) => !prev);
+    };
+
     const memoizedCodeEditor = useMemo(() => (
         <CodeEditor
             code={code}
@@ -167,29 +173,33 @@ export const ProblemDetail = () => {
         />
     ), [code, selectedLanguage]);
 
-    if (problemLoading) return <Loader2 className="animate-spin" />
+    if (problemLoading) {
+        return (
+            <div className="flex items-center justify-center h-screen bg-[#0e1111] w-full">
+                <LoaderDefault />
+            </div>
+        )
+    }
 
     const renderTabContent = () => {
         switch (activeTab) {
             case "description":
                 return (
                     <div className="text-sm text-gray-300 leading-relaxed p-4">
-                        {/* Problem Title and Company Tags */}
                         <div className="mb-6">
                             <div className="flex items-start justify-between mb-4">
                                 <div className="flex-1">
                                     <h1 className="text-2xl font-bold text-white mb-2">{problem?.title}</h1>
                                     <div className={`inline-block px-2 py-1 rounded-md text-xs font-medium ${problem?.difficulty === "EASY"
-                                            ? "bg-green-600/20 text-green-300 border border-green-600/30"
-                                            : problem?.difficulty === "MEDIUM"
-                                                ? "bg-yellow-600/20 text-yellow-300 border border-yellow-600/30"
-                                                : "bg-red-600/20 text-red-300 border border-red-600/30"
+                                        ? "bg-green-600/20 text-green-300 border border-green-600/30"
+                                        : problem?.difficulty === "MEDIUM"
+                                            ? "bg-yellow-600/20 text-yellow-300 border border-yellow-600/30"
+                                            : "bg-red-600/20 text-red-300 border border-red-600/30"
                                         }`}>
                                         {problem?.difficulty}
                                     </div>
                                 </div>
 
-                                {/* Company Tags - Right Side */}
                                 {problem?.company && problem.company.length > 0 && (
                                     <div className="ml-4 flex-shrink-0">
                                         <div className="flex items-center gap-2 mb-2">
@@ -266,7 +276,7 @@ export const ProblemDetail = () => {
                                         <div className="flex items-center gap-2">
                                             <Lightbulb className="w-4 h-4 text-yellow-400" />
                                             <Typography sx={{ fontWeight: 'bold', fontSize: '16px' }}>
-                                                Hints 
+                                                Hints
                                             </Typography>
                                         </div>
                                     </AccordionSummary>
@@ -336,8 +346,16 @@ export const ProblemDetail = () => {
                                 </div>
                             </div>
                         )}
+
+                        <button
+                            onClick={handleChatModelOpen}
+                            className="fixed bottom-6 right-6 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-full shadow-lg transition z-50"
+                        >
+                            Ask AI
+                        </button>
                     </>
                 );
+
             case "testCaseResult":
                 return (
                     <>
@@ -372,7 +390,6 @@ export const ProblemDetail = () => {
                                             )}
                                             Case {idx + 1}
                                         </button>
-
                                     ))}
                                 </div>
 
@@ -403,8 +420,16 @@ export const ProblemDetail = () => {
                                 <div className="text-sm">Run your code to see the results</div>
                             </div>
                         )}
+
+                        <button
+                            onClick={handleChatModelOpen}
+                            className="fixed bottom-6 right-6 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-full shadow-lg transition z-50"
+                        >
+                            Ask AI
+                        </button>
                     </>
                 );
+
             default:
                 return null;
         }
@@ -412,6 +437,9 @@ export const ProblemDetail = () => {
 
     return (
         <div className='h-screen bg-[#222222] text-white flex flex-col w-full'>
+            {aiModelOpen && (
+                <AiChatModel isOpen={true} setIsOpen={setAiModelOpen} context={problem}/>
+            )}
             <div className="bg-[#222222] border-b border-gray-700 px-2 py-2 flex items-center justify-between">
                 <div className="flex items-center space-x-4">
                     <div className="flex items-center space-x-2" onClick={() => navigate("/problems")}>

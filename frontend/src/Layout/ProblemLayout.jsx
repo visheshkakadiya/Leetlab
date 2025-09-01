@@ -5,7 +5,7 @@ import { SideBar } from '../components/SideBar';
 
 const ProblemLayout = () => {
   return (
-    <div className="h-screen flex flex-col w-full">
+    <div className="h-screen flex flex-col w-full bg-[#0e1111]">
       <Navbar />
       <div className="flex flex-1 overflow-hidden">
         <SideBar />

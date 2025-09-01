@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { Logo } from './Logo'
 import { Link, useNavigate, NavLink } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faUser, faRightFromBracket, faPlus } from '@fortawesome/free-solid-svg-icons'
-import { getStreak, logoutUser } from '../store/Slices/authSlice.js';
+import { currentUser, getProfile, getStreak, logoutUser } from '../store/Slices/authSlice.js';
 import { Flame } from 'lucide-react'
 
 const Navbar = () => {
@@ -12,7 +12,7 @@ const Navbar = () => {
     const navigate = useNavigate()
     const authUser = useSelector((state) => state.auth?.status)
     const userId = useSelector((state) => state.auth?.user?.id)
-    const avatar = useSelector((state) => state.auth?.user?.avatar?.url)
+    const avatar = useSelector((state) => state.auth?.user?.imageUrl)
     const user = useSelector((state) => state.auth?.user)
     // const streak = useSelector((state) => state.auth?.streak)
     const [toggleMenu, setToggleMenu] = useState(false)
@@ -29,6 +29,13 @@ const Navbar = () => {
             link: '/login',
         }
     ]
+
+    useEffect(() => {
+        if (avatar === undefined) {
+            dispatch(currentUser());
+        }
+    }, [authUser, userId, dispatch]);
+
 
     const handleLogout = () => {
         dispatch(logoutUser())
@@ -61,12 +68,17 @@ const Navbar = () => {
                                 <span className='font-bold text-white mt-1.5'>{streak.streak}</span>
                             </div>
                         )} */}
-                        <img
-                            src={avatar || 'https://avatar.iran.liara.run/public/boy.png'}
-                            alt='User Avatar'
-                            className='w-9 h-9 object-cover rounded-full cursor-pointer'
-                            onClick={() => setToggleMenu(!toggleMenu)}
-                        />
+                        {avatar === undefined ? (
+                            <div className='w-9 h-9 bg-gray-600 rounded-full cursor-pointer animate-pulse'></div>
+                        ) : (
+                            <img
+                                src={avatar || 'https://avatar.iran.liara.run/public/boy.png'}
+                                alt='User Avatar'
+                                className='w-9 h-9 object-cover rounded-full cursor-pointer'
+                                onClick={() => setToggleMenu(!toggleMenu)}
+                            />
+                        )}
+
                     </div>
 
                     {toggleMenu && (
