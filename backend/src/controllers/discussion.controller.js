@@ -110,7 +110,6 @@ const getAllDiscussions = asyncHandler(async (req, res) => {
                     },
                 },
                 upVotes: true,
-                replies: true,
             },
         });
 

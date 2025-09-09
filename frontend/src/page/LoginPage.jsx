@@ -37,7 +37,7 @@ export default function LoginPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-screen">
+      <div className="w-full flex items-center justify-center h-screen bg-[#0e1111]">
         <LoaderDefault />
       </div>
     );

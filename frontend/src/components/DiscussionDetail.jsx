@@ -16,13 +16,52 @@ import {
   CornerUpLeft
 } from 'lucide-react';
 
+const dummyDiscussion = {
+  id: "1",
+  title: "How to optimize Dijkstra's Algorithm?",
+  content: "I'm struggling with optimizing Dijkstra's algorithm for large graphs. Any tips or code examples?",
+  user: {
+    id: "u1",
+    name: "Alice",
+    imageUrl: "",
+  },
+  views: 123,
+  upvotes: 10,
+  createdAt: new Date(Date.now() - 3600 * 1000 * 5).toISOString(), // 5 hours ago
+  updatedAt: new Date(Date.now() - 3600 * 1000 * 2).toISOString(), // 2 hours ago
+};
+
+const dummyReplies = [
+  {
+    id: "r1",
+    content: "Try using a min-heap for the priority queue. It speeds things up a lot!",
+    user: {
+      id: "u2",
+      name: "Bob",
+      imageUrl: "",
+    },
+    createdAt: new Date(Date.now() - 3600 * 1000 * 4).toISOString(), // 4 hours ago
+  },
+  {
+    id: "r2",
+    content: "Also, check if your graph is sparse. You can use adjacency lists for better performance.",
+    user: {
+      id: "u3",
+      name: "Charlie",
+      imageUrl: "",
+    },
+    createdAt: new Date(Date.now() - 3600 * 1000 * 3).toISOString(), // 3 hours ago
+  },
+];
+
 const DiscussionDetail = () => {
   const [newComment, setNewComment] = useState('');
   const { discussionId } = useParams();
   const dispatch = useDispatch();
 
-  const discussion = useSelector((state) => state.discussion?.discussion);
-  const replies = useSelector((state) => state.replies?.replies);
+  // Use dummy data if Redux state is empty
+  const discussion = useSelector((state) => state.discussion?.discussion) || dummyDiscussion;
+  const replies = useSelector((state) => state.replies?.replies) || dummyReplies;
   const user = useSelector((state) => state.auth?.user);
 
   console.log("discussion detail", discussion);

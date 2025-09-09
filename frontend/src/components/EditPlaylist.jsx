@@ -27,7 +27,6 @@ export const EditPlaylist = ({ isOpen, onClose, playlist }) => {
     }
   });
 
-  // Set form values when playlist data is available
   useEffect(() => {
     if (playlist && isOpen) {
       setValue('name', playlist.name || '');
@@ -35,7 +34,6 @@ export const EditPlaylist = ({ isOpen, onClose, playlist }) => {
     }
   }, [playlist, setValue, isOpen]);
 
-  // Reset form when modal closes
   useEffect(() => {
     if (!isOpen) {
       reset();
@@ -55,6 +53,7 @@ export const EditPlaylist = ({ isOpen, onClose, playlist }) => {
 
       await dispatch(updatePlaylist(updateData));
       await dispatch(getOwnPlaylists());
+      await dispatch(getPlaylistById(playlist.id));
       onClose();
     } catch (error) {
       console.error('Error updating playlist:', error);

@@ -151,7 +151,10 @@ const getPlaylistById = asyncHandler(async (req, res) => {
                                     userId: req.user.id,
                                 },
                                 select: {
-                                    problem: true,
+                                    id: true,
+                                    userId: true,
+                                    problemId: true,
+                                    problem: true
                                 }
                             }
                         }

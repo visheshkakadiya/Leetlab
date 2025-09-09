@@ -22,6 +22,7 @@ export const toggleReputation = createAsyncThunk("toggleReputation", async (user
 export const toggleUpVotes = createAsyncThunk("toggleUpVotes", async (discussionId) => {
     try {
         const response = await axiosInstance.post(`/toggle/toggle-upvotes/${discussionId}`);
+        console.log(response.data);
         return response.data;
     } catch (error) {
         Toast.error(error.response?.data?.message || "Failed to upvotes");

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Star, Globe, Plus } from 'lucide-react';
+import { Star, Globe, Plus, Lock } from 'lucide-react';
 import { useSelector, useDispatch } from 'react-redux';
 import {
     AddProblemToPlaylist,
@@ -16,7 +16,6 @@ export const AddToPlaylist = ({ problemId }) => {
     const dropdownRef = useRef(null);
 
     const playlists = useSelector((state) => state.playlist.playlists);
-    const playlist = useSelector((state) => state.playlist.playlist);
 
     // console.log('playlists', playlists);
     // console.log('playlist', playlist);
@@ -98,7 +97,11 @@ export const AddToPlaylist = ({ problemId }) => {
                                         />
 
                                         <span className="truncate text-sm text-white flex-1">{playlist.name}</span>
-                                        <Globe className="w-4 h-4 text-gray-400" />
+                                        {playlist.isPublished ? (
+                                            <Globe className="w-4 h-4 text-white" />
+                                        ) : (
+                                            <Lock className="w-4 h-4 text-white" />
+                                        )}
                                     </label>
                                 </li>
                             ))

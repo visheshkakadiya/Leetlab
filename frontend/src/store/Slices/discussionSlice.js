@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axiosInstance from "../../helper/axiosInstance.js";
 import { toast } from "react-hot-toast";
+import { BASE_URL } from "@/constants.js";
 
 const initialState = {
     loading: false,
@@ -8,9 +9,13 @@ const initialState = {
     discussion: null,
 }
 
-export const getAllDiscussions = createAsyncThunk("getAllDiscussions", async () => {
+export const getAllDiscussions = createAsyncThunk("getAllDiscussions", async (sort) => {
     try {
-        const response = await axiosInstance.get("/discussion/get-all-discussions");
+        const url = new URL(`${BASE_URL}/discussion/get-all-discussions`);
+        
+        if(sort) url.searchParams.append("sort", sort);
+
+        const response = await axiosInstance.get(url);
         return response.data.data;
     } catch (error) {
         toast.error(error.response?.data?.message || "Failed to get discussions");
@@ -96,8 +101,9 @@ const discussionSlice = createSlice({
             .addCase(updateDiscussion.pending, (state) => {
                 state.loading = true;
             })
-            .addCase(updateDiscussion.fulfilled, (state) => {
+            .addCase(updateDiscussion.fulfilled, (state, action) => {
                 state.loading = false;
+                state.discussion = action.payload;
             })
     }
 })

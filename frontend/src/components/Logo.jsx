@@ -6,7 +6,7 @@ export const Logo = () => {
         <div>
             <Link to="/" className='flex gap-2 items-center'>
                 <Code className="h-6 w-6 text-emerald-400" />
-                <span className="text-lg font-bold">NexCode</span>
+                <span className="text-lg font-bold text-white">NexCode</span>
             </Link>
         </div>
     )

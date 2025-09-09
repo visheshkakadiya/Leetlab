@@ -19,6 +19,8 @@ import AdminRoute from './components/AdminRoute.jsx'
 import ComplexityModel from './components/ComplexityModel.jsx'
 import AiChatModel from './components/AiChatModel.jsx'
 import Loader from './components/Testing2.jsx'
+import { DiscussionDetail } from './components/DiscussionDetail'
+import Discussions from './components/Discussions'
 
 const App = () => {
 
@@ -51,13 +53,23 @@ const App = () => {
             <AuthLayout authentication={false}>
               <HomePage />
             </AuthLayout>
-          } />
+          }
+          />
 
           <Route
             path='/profile/:userId'
             element={
               <AuthLayout authentication>
                 <ProfileDetails />
+              </AuthLayout>
+            }
+          />
+
+          <Route
+            path='/discussions'
+            element={
+              <AuthLayout authentication={false}>
+                <Discussions />
               </AuthLayout>
             }
           />
@@ -72,7 +84,7 @@ const App = () => {
         />
         <Route
           path='/testing'
-          element={<Loader />}
+          element={<Discussions />}
         />
         <Route
           path='/signup'

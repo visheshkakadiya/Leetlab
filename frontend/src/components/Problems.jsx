@@ -189,7 +189,7 @@ const ProblemsTable = ({ problems }) => {
                 >
                     Prev
                 </button>
-                <span className="btn btn-ghost btn-sm">
+                <span className="btn btn-ghost btn-sm text-white">
                     {currentPage} / {totalPages}
                 </span>
                 <button

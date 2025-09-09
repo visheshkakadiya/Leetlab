@@ -10,8 +10,6 @@ export const AddToPlaylistPopup = ({ isOpen, onClose, problemId, currentPlaylist
 
     const dispatch = useDispatch();
     const ownPlaylists = useSelector((state) => state.playlist?.playlists || []);
-    // console.log("ownPlaylists", ownPlaylists);
-    // console.log("isOpen", isOpen);
 
     useEffect(() => {
         if (isOpen) {

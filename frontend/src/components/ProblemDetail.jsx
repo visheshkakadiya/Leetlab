@@ -35,6 +35,7 @@ import AccordionDetails from '@mui/material/AccordionDetails';
 import Typography from '@mui/material/Typography';
 import AiChatModel from './AiChatModel.jsx';
 import LoaderDefault from './LoaderDefault.jsx';
+import { ClipLoader } from 'react-spinners';
 
 const CodeEditor = React.memo(({ code, setCode, selectedLanguage }) => {
     return (
@@ -457,7 +458,7 @@ export const ProblemDetail = () => {
                     >
                         {running && !submitting ? (
                             <>
-                                <Loader2 size={20} className="animate-spin" /> Running
+                                <ClipLoader className='text-white' size={20} color='white'/> Running
                             </>
                         ) : (
                             <>
@@ -475,7 +476,7 @@ export const ProblemDetail = () => {
                     >
                         {submitting && !running ? (
                             <>
-                                <Loader2 size={20} className="animate-spin" /> Compiling
+                                <ClipLoader className='text-white' size={20} color='white'/> Compiling
                             </>
                         ) : (
                             <>

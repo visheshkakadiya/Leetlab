@@ -151,16 +151,23 @@ const playlistSlice = createSlice({
             })
             .addCase(RemoveProblemFromPlaylist.fulfilled, (state, action) => {
                 state.loading = false,
-                    state.playlist.problems = state.playlist.problems.filter(
-                        (problemData) => problemData.problem?.id !== action.payload.id
-                    );
+                state.playlist = action.payload
+            })
+            .addCase(getUserPlaylists.pending, (state) => {
+                state.loading = true
             })
             .addCase(getUserPlaylists.fulfilled, (state, action) => {
                 state.playlists = action.payload
             })
+            .addCase(getOwnPlaylists.pending, (state) => {
+                state.loading = true
+            })
             .addCase(getOwnPlaylists.fulfilled, (state, action) => {
                 state.loading = false
                 state.playlists = Array.isArray(action.payload) ? action.payload : []
+            })
+            .addCase(getPlaylistById.pending, (state) => {
+                state.loading = true
             })
             .addCase(getPlaylistById.fulfilled, (state, action) => {
                 state.playlist = action.payload

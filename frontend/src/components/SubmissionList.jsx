@@ -73,9 +73,9 @@ const SubmissionsList = ({ submissions, isLoading, submissionId }) => {
   }
 
   return (
-    <div className="bg-white dark:bg-[#1E1E1E] rounded-lg">
+    <div className="bg-white/5 dark:bg-[#1E1E1E] rounded-lg">
       <div className="border-b border-gray-200 dark:border-gray-700 px-4 py-3">
-        <div className="grid grid-cols-10 gap-4 text-sm font-medium text-gray-600 dark:text-gray-400">
+        <div className="grid grid-cols-10 gap-4 text-sm font-medium text-white dark:text-gray-400">
           <div className="col-span-3">Status</div>
           <div className="col-span-2">Language</div>
           <div className="col-span-2">Runtime</div>
@@ -92,7 +92,7 @@ const SubmissionsList = ({ submissions, isLoading, submissionId }) => {
           return (
             <div
               key={submission.id}
-              className="px-4 py-4 hover:bg-gray-50 dark:hover:bg-white/10 transition-colors cursor-pointer"
+              className="px-4 py-4 hover:bg-white/10 dark:hover:bg-white/10 transition-colors cursor-pointer"
               onClick={() => handleSubmissionId(submission?.id)}
             >
               <div className="grid grid-cols-10 gap-4 items-center">

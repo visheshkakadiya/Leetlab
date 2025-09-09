@@ -40,6 +40,16 @@ const toggleUpVotes = asyncHandler(async (req, res) => {
     const {discussionId} = req.params;
     const userId = req.user?.id
 
+    const discussion = await db.discussion.findUnique({
+        where: {
+            id: discussionId,
+        }
+    })
+
+    if (!discussion) {
+        throw new ApiError(401, "Discussion not found")
+    }
+
     const upVotedAlready = await db.upVotes.findFirst({
         where: {
             discussionId: discussionId,
@@ -54,6 +64,20 @@ const toggleUpVotes = asyncHandler(async (req, res) => {
             }
         })
 
+        await db.discussion.update({
+            where: {
+                id: discussionId,
+                upvotes: {
+                    gt: 0
+                }
+            },
+            data: {
+                upvotes: {
+                    decrement: 1
+                }
+            }
+        })
+
         return res.status(200).json(
             new ApiResponse(200, { isUpVoted: false }, "Upvote removed successfully")
         )
@@ -63,6 +87,17 @@ const toggleUpVotes = asyncHandler(async (req, res) => {
         data: {
             discussionId: discussionId,
             userId
+        }
+    })
+
+    await db.discussion.update({
+        where: {
+            id: discussionId,
+        },
+        data: {
+            upvotes: {
+                increment: 1
+            }
         }
     })
 

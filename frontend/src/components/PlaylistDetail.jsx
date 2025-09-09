@@ -16,6 +16,12 @@ import {
   Clock
 } from 'lucide-react';
 import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import {
   getPlaylistById,
   copyPlaylist,
   deletePlaylist,
@@ -39,7 +45,6 @@ export const PlaylistDetail = () => {
   const [selectedFilter, setSelectedFilter] = useState('all');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [problemMenuOpen, setProblemMenuOpen] = useState(null);
   const [addToPlaylistOpen, setAddToPlaylistOpen] = useState(false);
   const [selectedProblemId, setSelectedProblemId] = useState(null);
 
@@ -49,9 +54,7 @@ export const PlaylistDetail = () => {
 
   const loading = useSelector((state) => state.playlist?.loading);
   const playlist = useSelector((state) => state.playlist?.playlist);
-  console.log("playlist", playlist);
   const user = useSelector((state) => state.auth?.user);
-  console.log("user", user?.id);
 
   const isOwner = user?.id === playlist?.userId;
 
@@ -140,17 +143,6 @@ export const PlaylistDetail = () => {
     }
   }, [dispatch, playlistId]);
 
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (problemMenuOpen && !event.target.closest('.problem-menu')) {
-        setProblemMenuOpen(null);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [problemMenuOpen]);
-
   const handleCopyPlaylist = () => {
     dispatch(copyPlaylist(playlistId))
       .unwrap()
@@ -181,17 +173,20 @@ export const PlaylistDetail = () => {
       .then(() => {
         dispatch(getPlaylistById(playlistId));
       })
-    setProblemMenuOpen(null);
   };
 
+  // FIX: Refetch playlist after adding a problem
   const handleAddToPlaylist = (targetPlaylistId, problemId) => {
-    return dispatch(AddProblemToPlaylist({ playlistId: targetPlaylistId, problemId }))
+    dispatch(AddProblemToPlaylist({ playlistId: targetPlaylistId, problemId }))
+      .unwrap()
+      .then(() => {
+        dispatch(getPlaylistById(playlistId));
+      });
   };
 
   const openAddToPlaylist = (problemId) => {
     setSelectedProblemId(problemId);
     setAddToPlaylistOpen(true);
-    setProblemMenuOpen(null);
   };
 
   const getDifficultyColor = (difficulty) => {
@@ -239,37 +234,40 @@ export const PlaylistDetail = () => {
               <span>Start Practice</span>
             </button>
             <div className="relative">
-              <button
-                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                className="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-white/10 transition-colors"
-              >
-                <MoreVertical className="w-5 h-5" />
-              </button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button className="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-white/10 transition-colors">
+                    <MoreVertical className="w-5 h-5" />
+                  </button>
+                </DropdownMenuTrigger>
 
-              {isDropdownOpen && (
-                <div className="absolute right-0 mt-2 w-32 bg-[#222222] rounded-md shadow-lg z-50 py-1 text-sm border border-slate-700">
+                <DropdownMenuContent
+                  align="end"
+                  className="w-32 bg-[#222222] rounded-md shadow-lg z-50 py-1 text-sm border border-slate-700"
+                >
                   {!isOwner && (
-                    <button
+                    <DropdownMenuItem
                       onClick={handleCopyPlaylist}
-                      className="flex w-full px-2 py-2 gap-2 text-left hover:bg-[#353839] transition-colors hover:cursor-pointer"
+                      className="flex gap-2 px-2 py-2 text-white hover:bg-[#353839] transition-colors hover:cursor-pointer"
                     >
-                      <GitFork size={18} />Fork
-                    </button>
+                      <GitFork size={18} /> Fork
+                    </DropdownMenuItem>
                   )}
+
                   {isOwner && (
                     <>
-                      <button
+                      <DropdownMenuItem
                         onClick={() => {
-                          setIsEditModalOpen(true);
-                          setIsDropdownOpen(false);
+                          setIsEditModalOpen(true)
                         }}
-                        className="w-full flex gap-2 px-2 py-2 text-left hover:bg-[#353839] transition-colors hover:cursor-pointer"
+                        className="flex gap-2 px-2 py-2 text-white hover:bg-[#353839] transition-colors hover:cursor-pointer"
                       >
                         <Pen size={18} /> Edit
-                      </button>
-                      <button
+                      </DropdownMenuItem>
+
+                      <DropdownMenuItem
                         onClick={handleTogglePublish}
-                        className="flex gap-2 w-full px-2 py-2 text-left hover:bg-[#353839] transition-colors hover:cursor-pointer"
+                        className="flex gap-2 px-2 py-2 text-white hover:bg-[#353839] transition-colors hover:cursor-pointer"
                       >
                         {playlist?.isPublished ? (
                           <>
@@ -282,17 +280,18 @@ export const PlaylistDetail = () => {
                             Make Public
                           </>
                         )}
-                      </button>
-                      <button
+                      </DropdownMenuItem>
+
+                      <DropdownMenuItem
                         onClick={handleDeletePlaylist}
-                        className="flex gap-2 w-full px-2 py-2 text-left hover:bg-[#353839] transition-colors text-red-400 hover:cursor-pointer"
+                        className="flex gap-2 px-2 py-2 hover:bg-[#353839] transition-colors text-red-400 hover:cursor-pointer"
                       >
                         <Trash size={18} /> Delete
-                      </button>
+                      </DropdownMenuItem>
                     </>
                   )}
-                </div>
-              )}
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
 
@@ -461,9 +460,7 @@ export const PlaylistDetail = () => {
                   <tbody>
                     {filteredProblems.map((problemData, index) => {
                       const problem = problemData.problem;
-                      console.log("problem", problem);
-                      console.log("problemSolved", problem?.solvedBy);
-                      const isSolved = problem?.solvedBy?.some(entry => entry?.problem?.userId === user?.id);
+                      const isSolved = problem?.solvedBy?.some(entry => entry?.userId === user?.id);
 
                       return (
                         <tr
@@ -498,36 +495,39 @@ export const PlaylistDetail = () => {
 
                                 {user && (
                                   <div className="relative problem-menu">
-                                    <button
-                                      onClick={() => setProblemMenuOpen(
-                                        problemMenuOpen === problem?.id ? null : problem?.id
-                                      )}
-                                      className="p-1 rounded hover:bg-white/10 text-slate-400 hover:text-slate-300 transition-colors"
-                                      title="More options"
-                                    >
-                                      <MoreVertical className="w-4 h-4" />
-                                    </button>
-
-                                    {problemMenuOpen === problem?.id && (
-                                      <div className="absolute right-0 mt-2 w-48 bg-[#222222] rounded-md shadow-lg z-50 py-1 text-sm border border-slate-700">
+                                    <DropdownMenu>
+                                      <DropdownMenuTrigger asChild>
                                         <button
+                                          className="p-1 rounded hover:bg-white/10 text-slate-400 hover:text-slate-300 transition-colors"
+                                          title="More options"
+                                        >
+                                          <MoreVertical className="w-4 h-4" />
+                                        </button>
+                                      </DropdownMenuTrigger>
+
+                                      <DropdownMenuContent
+                                        align="end"
+                                        className="w-48 bg-[#222222] rounded-md shadow-lg z-50 py-1 text-sm border border-slate-700"
+                                      >
+                                        <DropdownMenuItem
                                           onClick={() => openAddToPlaylist(problem?.id)}
-                                          className="w-full px-4 py-2 text-left hover:bg-white/10 transition-colors flex items-center space-x-2"
+                                          className="w-full px-4 py-2 text-white hover:bg-white/10 transition-colors flex items-center space-x-2"
                                         >
                                           <Plus className="w-4 h-4" />
                                           <span>Add to Playlist</span>
-                                        </button>
+                                        </DropdownMenuItem>
+
                                         {isOwner && (
-                                          <button
+                                          <DropdownMenuItem
                                             onClick={() => handleRemoveProblem(problem?.id)}
-                                            className="w-full px-4 py-2 text-left hover:bg-slate-700 transition-colors text-red-400 flex items-center space-x-2"
+                                            className="w-full px-4 py-2 hover:bg-slate-700 transition-colors text-red-400 flex items-center space-x-2"
                                           >
                                             <Trash2 className="w-4 h-4" />
-                                            <span>Remove from Playlist</span>
-                                          </button>
+                                            <span>Remove</span>
+                                          </DropdownMenuItem>
                                         )}
-                                      </div>
-                                    )}
+                                      </DropdownMenuContent>
+                                    </DropdownMenu>
                                   </div>
                                 )}
                               </div>
