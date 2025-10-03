@@ -158,7 +158,7 @@ export default function LoginPage() {
           </div>
         </div>
 
-        <div className="mt-4 flex justify-center">
+        <div className="w-full mt-4 flex justify-center">
           <GoogleLogin
             theme="filled_blue"
             onSuccess={(credentialResponse) => {
