@@ -24,7 +24,6 @@ const ProbemPage = () => {
 
     return (
         <div className="w-full min-h-screen flex flex-col items-center px-4 bg-[#0e1111]">
-            {/* Compact Header Section */}
             <div className="w-full max-w-6xl bg-[#1a1d1f] rounded-xl px-6 py-5 mt-6 mb-6 border border-[#2e2e2e] shadow-md flex justify-between items-center">
                 <div>
                     <h1 className="text-xl md:text-2xl font-bold text-white">
@@ -34,12 +33,11 @@ const ProbemPage = () => {
                         Browse challenges and sharpen your coding skills!
                     </p>
                 </div>
-                <div className="hidden md:block bg-primary text-black font-semibold px-4 py-2 rounded-lg shadow hover:brightness-110 transition">
-                    NexCode 🚀
+                <div className="hidden md:block bg-green-500 text-black font-semibold px-4 py-2 rounded-lg shadow hover:brightness-110 transition">
+                    NexCode
                 </div>
             </div>
 
-            {/* Problems Table */}
             {problems?.length > 0 ? (
                 <ProblemsTable problems={problems} />
             ) : (

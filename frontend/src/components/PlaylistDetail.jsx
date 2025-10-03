@@ -125,8 +125,6 @@ export const PlaylistDetail = () => {
       const isSolved = problem?.solvedBy?.some(entry => entry?.problem?.userId === user?.id);
 
       const matchesFilter = selectedFilter === 'all' ||
-        (selectedFilter === 'solved' && isSolved) ||
-        (selectedFilter === 'unsolved' && !isSolved) ||
         (selectedFilter === 'easy' && problem?.difficulty === 'EASY') ||
         (selectedFilter === 'medium' && problem?.difficulty === 'MEDIUM') ||
         (selectedFilter === 'hard' && problem?.difficulty === 'HARD');
@@ -175,7 +173,6 @@ export const PlaylistDetail = () => {
       })
   };
 
-  // FIX: Refetch playlist after adding a problem
   const handleAddToPlaylist = (targetPlaylistId, problemId) => {
     dispatch(AddProblemToPlaylist({ playlistId: targetPlaylistId, problemId }))
       .unwrap()
@@ -200,10 +197,10 @@ export const PlaylistDetail = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#222222] flex items-center justify-center">
+      <div className="min-h-screen bg-[#0e1111] flex items-center justify-center">
         <LoaderDefault />
       </div>
-    );
+    )
   }
 
   if (!playlist) {
@@ -443,8 +440,6 @@ export const PlaylistDetail = () => {
               className="bg-[#222222] border border-slate-700 rounded-lg px-4 py-2.5 text-slate-100 focus:outline-none focus:border-violet-500 transition-colors"
             >
               <option value="all">All Problems</option>
-              <option value="solved">Solved</option>
-              <option value="unsolved">Unsolved</option>
               <option value="easy">Easy</option>
               <option value="medium">Medium</option>
               <option value="hard">Hard</option>

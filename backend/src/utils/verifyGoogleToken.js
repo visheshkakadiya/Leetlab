@@ -2,7 +2,6 @@ import { OAuth2Client } from 'google-auth-library'
 import ApiError from './ApiError.js';
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
-// console.log("client: ", client)
 
 export const verifyGoogleToken = async (credential) => {
     if (!credential) {

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { X, Plus } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
 import { getOwnPlaylists } from '../store/Slices/playlistSlice.js';
+import { ClipLoader } from 'react-spinners';
 
 export const AddToPlaylistPopup = ({ isOpen, onClose, problemId, currentPlaylistId, onAdd }) => {
     const [selectedPlaylist, setSelectedPlaylist] = useState('');
@@ -10,6 +11,7 @@ export const AddToPlaylistPopup = ({ isOpen, onClose, problemId, currentPlaylist
 
     const dispatch = useDispatch();
     const ownPlaylists = useSelector((state) => state.playlist?.playlists || []);
+    const playlistsLoading = useSelector((state) => state.playlist?.playlistsLoading || false);
 
     useEffect(() => {
         if (isOpen) {
@@ -70,25 +72,35 @@ export const AddToPlaylistPopup = ({ isOpen, onClose, problemId, currentPlaylist
                     <label className="block text-sm font-medium text-slate-300 mb-2">
                         Select Playlist
                     </label>
-                    <select
-                        value={selectedPlaylist}
-                        onChange={(e) => setSelectedPlaylist(e.target.value)}
-                        className="w-full bg-white/10 border border-slate-700 rounded-lg px-4 py-2.5 text-slate-100 focus:outline-none transition-colors"
-                    >
-                        <option value="" className="text-slate-400">Choose a playlist...</option>
-                        {availablePlaylists.map((playlist) => (
-                            <option key={playlist.id} value={playlist.id} className="text-black">
-                                {playlist.name}
-                            </option>
-                        ))}
-                    </select>
 
-
-                    {availablePlaylists.length === 0 && (
-                        <div className="mt-4 text-center py-4">
-                            <div className="text-slate-400 mb-2">No other playlists found</div>
-                            <p className="text-slate-500 text-sm">Create a new playlist to add this problem</p>
+                    {playlistsLoading ? (
+                        <div className="flex items-center justify-center py-8">
+                            <ClipLoader color="white" size={20} />
+                            <span className="ml-2 text-slate-400">Loading playlists...</span>
                         </div>
+                    ) : (
+                        <>
+                            <select
+                                value={selectedPlaylist}
+                                onChange={(e) => setSelectedPlaylist(e.target.value)}
+                                className="w-full bg-white/10 border border-slate-700 rounded-lg px-4 py-2.5 text-slate-100 focus:outline-none transition-colors"
+                                disabled={playlistsLoading}
+                            >
+                                <option value="" className="text-slate-400">Choose a playlist...</option>
+                                {availablePlaylists.map((playlist) => (
+                                    <option key={playlist.id} value={playlist.id} className="text-black">
+                                        {playlist.name}
+                                    </option>
+                                ))}
+                            </select>
+
+                            {availablePlaylists.length === 0 && !playlistsLoading && (
+                                <div className="mt-4 text-center py-4">
+                                    <div className="text-slate-400 mb-2">No other playlists found</div>
+                                    <p className="text-slate-500 text-sm">Create a new playlist to add this problem</p>
+                                </div>
+                            )}
+                        </>
                     )}
                 </div>
 
@@ -109,7 +121,7 @@ export const AddToPlaylistPopup = ({ isOpen, onClose, problemId, currentPlaylist
                     </button>
                     <button
                         onClick={handleAddToPlatlist}
-                        disabled={loading || !selectedPlaylist}
+                        disabled={loading || !selectedPlaylist || playlistsLoading}
                         className="bg-white/10 hover:cursor-pointer disabled:bg-slate-700 disabled:text-slate-400 px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors text-sm font-medium"
                     >
                         {loading ? (

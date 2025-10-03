@@ -31,7 +31,7 @@ const getDiscussionReplies = asyncHandler(async (req, res) => {
         }
     })
 
-    if (!replies || replies.length === 0) {
+    if (!replies) {
         throw new ApiError(404, "No replies found")
     }
 
@@ -65,6 +65,14 @@ const addReply = asyncHandler(async (req, res) => {
             content,
             discussionId,
             userId
+        },
+        include: {
+            user: {
+                select: {
+                    name: true,
+                    imageUrl: true
+                }
+            }
         }
     })
 
@@ -73,10 +81,7 @@ const addReply = asyncHandler(async (req, res) => {
     }
 
     res.status(201).json(
-        new ApiResponse(201, {
-            userId: userId,
-            content: content
-        }, "reply created successfully")
+        new ApiResponse(201, reply, "reply created successfully")
     )
 })
 

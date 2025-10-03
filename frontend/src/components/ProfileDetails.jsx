@@ -18,6 +18,7 @@ import { toggleReputation } from '../store/Slices/toggleSlice.js';
 import CalendarHeatmap from 'react-calendar-heatmap';
 import 'react-calendar-heatmap/dist/styles.css';
 import LoaderDefault from './LoaderDefault.jsx';
+import { getOwnDiscussions } from '@/store/Slices/discussionSlice.js';
 
 export function ProfileDetails() {
     const dispatch = useDispatch();
@@ -25,6 +26,7 @@ export function ProfileDetails() {
     const { userId } = useParams();
     const [activeTab, setActiveTab] = useState('submissions');
 
+    const discussions = useSelector((state) => state.discussion?.discussions);
     const problems = useSelector((state) => state.problem?.problems);
     const playlists = useSelector((state) => state.playlist?.playlists);
     const submissions = useSelector((state) => state.submissions?.submissions);
@@ -43,6 +45,7 @@ export function ProfileDetails() {
         dispatch(gitContribution(userId));
         dispatch(currentUser())
         dispatch(getProfile(userId));
+        dispatch(getOwnDiscussions(userId));
     }, [dispatch]);
 
     const reputations = user?.user?.reputation.map((rep) => rep.userId)
@@ -147,26 +150,22 @@ export function ProfileDetails() {
                 <div className="lg:col-span-1 space-y-6">
                     <div className="bg-[#222222] rounded-2xl p-6 border border-gray-700">
                         <div className="flex items-center space-x-4 pb-4 border-b border-gray-700">
-                            <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center">
-                                <User size={32} className="text-white" />
-                            </div>
+                            {user?.user?.imageUrl ? (
+                                <img src={user?.user?.imageUrl} className="w-14 h-14 rounded-full" alt="" />
+                            ) : (
+                                <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center">
+                                    <User size={32} className="text-white" />
+                                </div>
+                            )}
                             <div className="flex-1">
                                 <h2 className="text-xl font-bold mb-1">{user?.user?.name}</h2>
-                                <p className="text-gray-400 mb-2">@{user?.user?.name}</p>
-                                <div className="flex items-center justify-between">
-                                    <button className="bg-blue-600 hover:bg-blue-700 text-white py-1 px-3 rounded-lg text-xs font-medium transition-colors">
-                                        Edit Profile
-                                    </button>
-                                </div>
+                                <p className="text-gray-400 mb-2">{user?.user?.email}</p>
                             </div>
                         </div>
 
                         <div className="pt-4">
                             <div className="flex items-center justify-between mb-3">
                                 <h3 className="text-sm font-semibold text-blue-400">Community Stats</h3>
-                                {/* <div className="bg-white/10 px-3 py-1 rounded-lg">
-                                    <span className="text-xs text-gray-300">Rank #-</span>
-                                </div> */}
                             </div>
                             <div className="grid grid-cols-2 gap-3">
                                 {[
@@ -192,10 +191,10 @@ export function ProfileDetails() {
                                         <Star
                                             size={16}
                                             className={`${isOwnProfile
-                                                    ? 'text-gray-400'
-                                                    : localIsReputed
-                                                        ? 'text-yellow-400 fill-yellow-400'
-                                                        : 'text-gray-400 hover:text-yellow-400'
+                                                ? 'text-gray-400'
+                                                : localIsReputed
+                                                    ? 'text-yellow-400 fill-yellow-400'
+                                                    : 'text-gray-400 hover:text-yellow-400'
                                                 } transition-colors`}
                                         />
                                     </button>
@@ -221,7 +220,7 @@ export function ProfileDetails() {
                                         <span className="text-gray-300">{lang.name}</span>
                                     </div>
                                     <span className="text-sm text-gray-400">
-                                        {lang.problems > 0 ? `${lang.problems} solved` : 0 }
+                                        {lang.problems > 0 ? `${lang.problems} solved` : 0}
                                     </span>
                                 </div>
                             ))}
@@ -468,10 +467,45 @@ export function ProfileDetails() {
                                 </div>
                             )}
 
-                            {(activeTab === 'solutions' || activeTab === 'discussions') && (
+                            {activeTab === 'solutions' && (
                                 <div className="text-center py-8 text-gray-400">
                                     <MessageSquare size={48} className="mx-auto mb-4 opacity-50" />
                                     <p>Coming soon...</p>
+                                </div>
+                            )}
+
+                            {activeTab === 'discussions' && (
+                                <div className="space-y-4">
+                                    {discussions && discussions.length > 0 ? (
+                                        discussions.map((discussion, index) => (
+                                            <div key={index} onClick={() => navigate(`/discuss/${discussion.id}`)} className="flex items-center justify-between p-4 bg-white/10 rounded-xl hover:bg-white/15 transition-colors hover:cursor-pointer">
+                                                <div className="flex items-center space-x-4">
+                                                    <div className="flex-shrink-0">
+                                                        <MessageSquare size={20} className="text-gray-400" />
+                                                    </div>
+                                                    <div>
+                                                        <h4 className="font-medium text-white">{discussion.title}</h4>
+                                                        <div className="flex items-center space-x-3 mt-1">
+                                                            <span className="text-sm text-gray-400 flex items-center">
+                                                                <Eye size={14} className="mr-1" /> {discussion.views} views
+                                                            </span>
+                                                            <span className="text-sm text-gray-400">
+                                                                {discussion.upvotes} upvotes
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div className="text-gray-400 text-sm">
+                                                    {formatDate(discussion.createdAt)}
+                                                </div>
+                                            </div>
+                                        ))
+                                    ) : (
+                                        <div className="text-center py-8 text-gray-400">
+                                            <MessageSquare size={48} className="mx-auto mb-4 opacity-50" />
+                                            <p>No discussions found</p>
+                                        </div>
+                                    )}
                                 </div>
                             )}
                         </div>

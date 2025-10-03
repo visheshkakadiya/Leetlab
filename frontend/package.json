@@ -31,6 +31,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "daisyui": "^5.0.35",
+    "framer-motion": "^12.23.22",
     "lucide-react": "^0.510.0",
     "marked": "^16.2.1",
     "monaco-editor": "^0.52.2",

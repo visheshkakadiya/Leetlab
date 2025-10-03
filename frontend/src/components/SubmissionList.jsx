@@ -137,7 +137,6 @@ const SubmissionsList = ({ submissions, isLoading, submissionId }) => {
         })}
       </div>
 
-      {/* Show more button if there are many submissions */}
       {submissions.length > 10 && (
         <div className="p-4 text-center border-t border-gray-200 dark:border-gray-700">
           <button className="text-blue-600 hover:text-blue-700 text-sm font-medium">

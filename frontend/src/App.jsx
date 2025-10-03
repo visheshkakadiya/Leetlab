@@ -16,11 +16,10 @@ import { PlaylistDetail } from './components/PlaylistDetail.jsx'
 import PlaylistLayout from './Layout/PlaylistLayout.jsx'
 import { ProfileDetails } from './components/ProfileDetails.jsx'
 import AdminRoute from './components/AdminRoute.jsx'
-import ComplexityModel from './components/ComplexityModel.jsx'
-import AiChatModel from './components/AiChatModel.jsx'
-import Loader from './components/Testing2.jsx'
-import { DiscussionDetail } from './components/DiscussionDetail'
 import Discussions from './components/Discussions'
+import DiscussionCreate from './components/DiscussionCreate'
+import DiscussionDetails from './components/DiscussionDetails'
+import DiscussionUpdate from './components/DiscussionUpdate'
 
 const App = () => {
 
@@ -66,13 +65,41 @@ const App = () => {
           />
 
           <Route
-            path='/discussions'
+            path='/discuss'
             element={
-              <AuthLayout authentication={false}>
+              <AuthLayout authentication>
                 <Discussions />
               </AuthLayout>
             }
           />
+
+          <Route
+            path='/discuss/post'
+            element={
+              <AuthLayout authentication>
+                <DiscussionCreate />
+              </AuthLayout>
+            }
+          />
+
+          <Route
+            path='/discuss/:discussionId'
+            element={
+              <AuthLayout authentication>
+                <DiscussionDetails />
+              </AuthLayout>
+            }
+          />
+
+          <Route 
+            path='/discuss/edit/:discussionId'
+            element={
+              <AuthLayout authentication>
+                <DiscussionUpdate />
+              </AuthLayout>
+            }
+          />
+
         </Route>
         <Route
           path='/login'
@@ -82,10 +109,7 @@ const App = () => {
             </AuthLayout>
           }
         />
-        <Route
-          path='/testing'
-          element={<Discussions />}
-        />
+
         <Route
           path='/signup'
           element={

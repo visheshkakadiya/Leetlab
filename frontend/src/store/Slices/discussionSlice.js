@@ -44,6 +44,16 @@ export const getDiscussionById = createAsyncThunk("getDiscussionById", async (di
     }
 })
 
+export const getOwnDiscussions = createAsyncThunk("getOwnDiscussions", async (userId) => {
+    try {
+        const response = await axiosInstance.get(`/discussion/get-own-discussions/${userId}`);
+        return response.data.data;
+    } catch (error) {
+        toast.error(error.response?.data?.message || "Failed to get own discussions");
+        throw error;
+    }
+})
+
 export const deleteDiscussion = createAsyncThunk("deleteDiscussion", async (discussionId) => {
     try {
         const response = await axiosInstance.delete(`/discussion/delete-discussion/${discussionId}`);
@@ -104,6 +114,13 @@ const discussionSlice = createSlice({
             .addCase(updateDiscussion.fulfilled, (state, action) => {
                 state.loading = false;
                 state.discussion = action.payload;
+            })
+            .addCase(getOwnDiscussions.pending, (state) => {
+                state.loading = true;
+            })
+            .addCase(getOwnDiscussions.fulfilled, (state, action) => {
+                state.loading = false;
+                state.discussions = action.payload;
             })
     }
 })

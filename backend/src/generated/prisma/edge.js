@@ -291,7 +291,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "C:\\Users\\pcs\\Desktop\\Leetlab\\backend\\src\\generated\\prisma",
+      "value": "C:\\Users\\INDIA\\Desktop\\Leetlab\\backend\\src\\generated\\prisma",
       "fromEnvVar": null
     },
     "config": {
@@ -305,12 +305,11 @@ const config = {
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "C:\\Users\\pcs\\Desktop\\Leetlab\\backend\\prisma\\schema.prisma",
+    "sourceFilePath": "C:\\Users\\INDIA\\Desktop\\Leetlab\\backend\\prisma\\schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
-    "rootEnvPath": null,
-    "schemaEnvPath": "../../../.env"
+    "rootEnvPath": null
   },
   "relativePath": "../../../prisma",
   "clientVersion": "6.6.0",
@@ -319,11 +318,12 @@ const config = {
     "db"
   ],
   "activeProvider": "postgresql",
+  "postinstall": false,
   "inlineDatasources": {
     "db": {
       "url": {
         "fromEnvVar": "DATABASE_URL",
-        "value": "postgresql://leetlab_owner:npg_nxdSV2oy4jev@ep-patient-flower-a107hmeg-pooler.ap-southeast-1.aws.neon.tech/leetlab?sslmode=require"
+        "value": null
       }
     }
   },
