@@ -18,30 +18,30 @@ export const getDiscussionReplies = createAsyncThunk("getDiscussionReplies", asy
     }
 })
 
-export const addReply = createAsyncThunk("addReply", async (data) => {
+export const addReply = createAsyncThunk("addReply", async ({ data, discussionId }) => {
     try {
-        const response = await axiosInstance.post("/replies/add-reply", data);
-        return response.data;
+        const response = await axiosInstance.post(`/replies/add-reply/${discussionId}`, data);
+        return response.data.data; // return the reply object
     } catch (error) {
         toast.error(error.response?.data?.message || "Failed to create reply");
         throw error;
     }
-})
+});
 
 export const deleteReply = createAsyncThunk("deleteReply", async (replyId) => {
     try {
         const response = await axiosInstance.delete(`/replies/delete-reply/${replyId}`);
-        return response.data;
+        return replyId; // return the deleted replyId
     } catch (error) {
         toast.error(error.response?.data?.message || "Failed to delete reply");
         throw error;
     }
-})
+});
 
 export const updateReply = createAsyncThunk("updateReply", async ({ replyId, data }) => {
     try {
-        const response = await axiosInstance.put(`/replies/update-reply/${replyId}`, data);
-        return response.data;
+        const response = await axiosInstance.patch(`/replies/update-reply/${replyId}`, data);
+        return response.data.data; // return the updated reply object
     } catch (error) {
         toast.error(error.response?.data?.message || "Failed to update reply");
         throw error;

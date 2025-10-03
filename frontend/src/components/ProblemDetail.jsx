@@ -36,6 +36,15 @@ import Typography from '@mui/material/Typography';
 import AiChatModel from './AiChatModel.jsx';
 import LoaderDefault from './LoaderDefault.jsx';
 import { ClipLoader } from 'react-spinners';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faUser, faRightFromBracket } from '@fortawesome/free-solid-svg-icons';
+import { logoutUser } from '@/store/Slices/authSlice.js';
 
 const CodeEditor = React.memo(({ code, setCode, selectedLanguage }) => {
     return (
@@ -78,6 +87,10 @@ export const ProblemDetail = () => {
     const submissionsLoading = useSelector((state) => state.submissions?.loading);
     const submissions = useSelector((state) => state.submissions?.submission);
     const submissionIdData = useSelector((state) => state.submissions?.submissionIdData);
+
+    const user = useSelector((state) => state.auth?.user);
+    const avatar = useSelector((state) => state.auth?.user?.imageUrl);
+    const userId = useSelector((state) => state.auth?.user?.id);
 
     const [code, setCode] = useState("");
     const [activeTab, setActiveTab] = useState("description");
@@ -350,7 +363,7 @@ export const ProblemDetail = () => {
 
                         <button
                             onClick={handleChatModelOpen}
-                            className="fixed bottom-6 right-6 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-full shadow-lg transition z-50"
+                            className="cursor-pointer fixed bottom-6 right-6 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-full shadow-lg transition z-50"
                         >
                             Ask AI
                         </button>
@@ -436,6 +449,24 @@ export const ProblemDetail = () => {
         }
     };
 
+    const handleLogout = () => {
+        dispatch(logoutUser());
+        navigate('/login');
+    };
+
+    const toolTipItems = [
+        {
+            icon: <FontAwesomeIcon icon={faUser} />,
+            title: 'Visit Profile',
+            link: `/profile/${userId}`,
+        },
+        {
+            icon: <FontAwesomeIcon icon={faRightFromBracket} />,
+            title: 'Logout',
+            link: '/login',
+        }
+    ];
+
     return (
         <div className='h-screen bg-[#222222] text-white flex flex-col w-full'>
             {aiModelOpen && (
@@ -487,16 +518,36 @@ export const ProblemDetail = () => {
                     </button>
                 </div>
 
-                <div className="flex items-center space-x-4">
-                    <div className="flex items-center space-x-2 text-sm text-gray-400">
-                        <Users className="w-4 h-4" />
-                        <span>14.1K</span>
-                        <MessageSquare className="w-4 h-4" />
-                        <span>534</span>
-                    </div>
-                    <button className="p-2 hover:bg-gray-700 rounded">
-                        <Settings className="w-4 h-4" />
-                    </button>
+                <div className="flex items-center space-x-4 mr-5">
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <img
+                                src={avatar || 'https://avatar.iran.liara.run/public/boy.png'}
+                                alt="User Avatar"
+                                className="w-9 h-9 object-cover rounded-full border border-gray-700 cursor-pointer"
+                            />
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent className="bg-black/80 text-white border border-neutral-800 z-50 mt-3 mr-5 w-64 p-3 rounded-lg shadow-lg">
+                            {toolTipItems.map((item, index) =>
+                                item.title === 'Logout' ? (
+                                    <DropdownMenuItem key={index} onClick={handleLogout} className="flex items-center gap-2 px-2 py-1 hover:bg-white/10 rounded-sm text-red-700 hover:cursor-pointer">
+                                        {item.icon}
+                                        {item.title}
+                                    </DropdownMenuItem>
+                                ) : (
+                                    <DropdownMenuItem asChild key={index}>
+                                        <Link
+                                            to={item.link}
+                                            className="flex items-center gap-2 w-full px-2 py-1 hover:bg-white/10 rounded-sm hover:cursor-pointer"
+                                        >
+                                            {item.icon}
+                                            {item.title}
+                                        </Link>
+                                    </DropdownMenuItem>
+                                )
+                            )}
+                        </DropdownMenuContent>
+                    </DropdownMenu>
                 </div>
             </div>
 

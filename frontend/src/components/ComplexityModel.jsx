@@ -46,7 +46,7 @@ const ComplexityModal = ({ sourceCode, onClose }) => {
         ref={modalRef}
       >
         <button
-          className="absolute top-2 right-2 text-white hover:text-white/50 transition"
+          className="absolute top-2 right-2 text-white hover:text-white/50 transition cursor-pointer"
           onClick={onClose}
           aria-label="Close"
         >

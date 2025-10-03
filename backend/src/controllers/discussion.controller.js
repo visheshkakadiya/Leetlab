@@ -5,7 +5,7 @@ import ApiResponse from "../utils/ApiResponse.js";
 
 const createDiscussion = asyncHandler(async (req, res) => {
 
-    const { title, content } = req.body;
+    const { title, contentHtml: content } = req.body;
     const userId = req.user.id;
 
     if (!title || !content) {
@@ -175,7 +175,8 @@ const getDiscussionById = asyncHandler(async (req, res) => {
                         }
                     }
                 }
-            }
+            },
+            upVotes: true
         }
     })
 
@@ -188,10 +189,29 @@ const getDiscussionById = asyncHandler(async (req, res) => {
     )
 })
 
+const getOwnDiscussions = asyncHandler(async (req, res) => {
+    const { userId } = req.params
+
+    const discussions = await db.discussion.findMany({
+        where: {
+            userId: userId
+        },
+    })
+
+    if(!discussions) {
+        throw new ApiError(404, "No discussions found")
+    }
+
+    res.status(200).json(
+        new ApiResponse(200, discussions, "Discussions fetched successfully")
+    )
+})
+
 export {
     createDiscussion,
     updateDiscussion,
     deleteDiscussion,
     getAllDiscussions,
-    getDiscussionById
+    getDiscussionById,
+    getOwnDiscussions
 }

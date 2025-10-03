@@ -4,6 +4,7 @@ import { toast } from "react-hot-toast";
 
 const initialState = {
     loading: false,
+    playlistsLoading: false, // Separate loading state for playlists
     playlist: {
         problems: []
     },
@@ -20,7 +21,6 @@ export const createPlaylist = createAsyncThunk("createPlaylist", async (data) =>
         throw error
     }
 })
-
 
 export const updatePlaylist = createAsyncThunk("updatePlaylist", async ({ playlistId, name, description }) => {
     try {
@@ -121,13 +121,13 @@ const playlistSlice = createSlice({
                 state.loading = true
             })
             .addCase(updatePlaylist.fulfilled, (state, action) => {
-                state.loading = false
                 state.playlists = state.playlists.map((playlist) => {
                     if (playlist._id === action.payload._id) {
                         return action.payload
                     }
                     return playlist
                 })
+                state.loading = false
             })
             .addCase(updatePlaylist.rejected, (state) => {
                 state.loading = false
@@ -139,42 +139,86 @@ const playlistSlice = createSlice({
                 state.loading = false
                 state.playlists = state.playlists.filter((playlist) => playlist.id !== action.payload.id)
             })
+            .addCase(deletePlaylist.rejected, (state) => {
+                state.loading = false
+            })
             .addCase(AddProblemToPlaylist.pending, (state) => {
                 state.loading = true
             })
             .addCase(AddProblemToPlaylist.fulfilled, (state, action) => {
-                state.loading = false,
-                    state.playlist = action.payload
+                state.loading = false
+                state.playlist = action.payload
+            })
+            .addCase(AddProblemToPlaylist.rejected, (state) => {
+                state.loading = false
             })
             .addCase(RemoveProblemFromPlaylist.pending, (state) => {
                 state.loading = true
             })
             .addCase(RemoveProblemFromPlaylist.fulfilled, (state, action) => {
-                state.loading = false,
+                state.loading = false
                 state.playlist = action.payload
             })
+            .addCase(RemoveProblemFromPlaylist.rejected, (state) => {
+                state.loading = false
+            })
             .addCase(getUserPlaylists.pending, (state) => {
-                state.loading = true
+                state.playlistsLoading = true // Use separate loading state
             })
             .addCase(getUserPlaylists.fulfilled, (state, action) => {
+                state.playlistsLoading = false
                 state.playlists = action.payload
             })
+            .addCase(getUserPlaylists.rejected, (state) => {
+                state.playlistsLoading = false
+            })
             .addCase(getOwnPlaylists.pending, (state) => {
-                state.loading = true
+                state.playlistsLoading = true // Use separate loading state
             })
             .addCase(getOwnPlaylists.fulfilled, (state, action) => {
-                state.loading = false
+                state.playlistsLoading = false
                 state.playlists = Array.isArray(action.payload) ? action.payload : []
+            })
+            .addCase(getOwnPlaylists.rejected, (state) => {
+                state.playlistsLoading = false
             })
             .addCase(getPlaylistById.pending, (state) => {
                 state.loading = true
             })
             .addCase(getPlaylistById.fulfilled, (state, action) => {
+                state.loading = false
                 state.playlist = action.payload
+            })
+            .addCase(getPlaylistById.rejected, (state) => {
+                state.loading = false
+            })
+            .addCase(togglePublish.pending, (state) => {
+                state.loading = true
             })
             .addCase(togglePublish.fulfilled, (state, action) => {
                 state.loading = false
                 state.isPublished = !state.isPublished
+            })
+            .addCase(togglePublish.rejected, (state) => {
+                state.loading = false
+            })
+            .addCase(copyPlaylist.pending, (state) => {
+                state.loading = true
+            })
+            .addCase(copyPlaylist.fulfilled, (state, action) => {
+                state.loading = false
+            })
+            .addCase(copyPlaylist.rejected, (state) => {
+                state.loading = false
+            })
+            .addCase(createPlaylist.pending, (state) => {
+                state.loading = true
+            })
+            .addCase(createPlaylist.fulfilled, (state, action) => {
+                state.loading = false
+            })
+            .addCase(createPlaylist.rejected, (state) => {
+                state.loading = false
             })
     }
 })

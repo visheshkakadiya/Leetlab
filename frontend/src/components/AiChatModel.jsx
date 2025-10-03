@@ -64,7 +64,7 @@ function AiChatModel({ isOpen, setIsOpen, context }) {
           <h3 className="font-semibold text-lg text-gray-200">Ask AI</h3>
           <button
             onClick={() => setIsOpen(false)}
-            className="text-gray-400 hover:text-red-500 transition"
+            className="text-gray-400 hover:text-red-500 transition cursor-pointer"
           >
             ✕
           </button>
@@ -120,7 +120,7 @@ function AiChatModel({ isOpen, setIsOpen, context }) {
             />
             <button
               type="submit"
-              className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700 transition"
+              className="bg-blue-600 text-white cursor-pointer px-4 py-2 rounded-lg text-sm hover:bg-blue-700 transition"
               disabled={loading}
             >
               Send

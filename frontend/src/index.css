@@ -142,3 +142,56 @@
     @apply bg-background text-foreground;
   }
 }
+
+
+.w-md-editor {
+  background-color: #000000 !important;
+  color: #fff !important;
+  border-color: #130101 !important;
+  box-shadow: none !important;
+}
+
+.w-md-editor-toolbar {
+  background-color: #1f1f1f !important;
+  border-color: #262626 !important;
+}
+
+.w-md-editor-content {
+  background-color: #171717 !important;
+
+}
+
+.w-md-editor-content .w-md-editor-input {
+  background-color: #171717 !important;
+  color: #fff !important;
+}
+
+.wmde-markdown {
+  background-color: transparent !important;
+}
+
+.w-md-editor-preview {
+  background-color: #171717 !important;
+  color: #fff !important;
+}
+
+.w-md-editor-toolbar button {
+  color: #e5e5e5 !important;
+}
+
+.w-md-editor-toolbar button:hover {
+  background-color: #2a2a2a !important;
+}
+
+/* Target all toolbar buttons */
+.w-md-editor-toolbar button {
+  font-size: 18px !important;
+  /* You can increase this to 20px, 22px, etc. */
+  padding: 6px 10px !important;
+  /* Optional: increase padding for bigger buttons */
+}
+
+/* Optional: increase button height */
+.w-md-editor-toolbar {
+  min-height: 50px !important;
+}
