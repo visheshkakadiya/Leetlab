@@ -7,6 +7,7 @@ import { marked } from 'marked'
 import toast, { Toaster } from 'react-hot-toast'
 import { useNavigate, useParams } from 'react-router-dom'
 import { ArrowLeft } from 'lucide-react'
+import TurndownService from 'turndown'
 
 function DiscussionUpdate() {
     const { discussionId } = useParams();
@@ -15,6 +16,7 @@ function DiscussionUpdate() {
     const avatar = useSelector((state) => state.auth?.user?.imageUrl);
     const userData = useSelector((state) => state.auth?.user);
     const discussion = useSelector((state) => state.discussion?.discussion);
+    const turndownService = new TurndownService();
 
     const [content, setContent] = useState('');
 
@@ -38,8 +40,8 @@ function DiscussionUpdate() {
     useEffect(() => {
         if (discussion) {
             setValue('title', discussion.title || '');
-            setValue('content', discussion.content || '');
-            setContent(discussion.content || '');
+            setValue('content', turndownService.turndown(discussion.content || ''));
+            setContent(turndownService.turndown(discussion.content || ''));
         }
     }, [discussion, setValue]);
 
