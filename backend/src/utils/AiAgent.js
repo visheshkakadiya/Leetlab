@@ -100,10 +100,10 @@ Always encourage deeper thinking rather than shortcut answers.
 const getComplexity = async (code) => {
     try {
         const response = await openai.chat.completions.create({
-            model: 'gemini-2.0-flash',
+            model: 'gemini-2.5-flash',
             messages: [
-                {role: 'system', content: contest_prompt},
-                {role: 'user', content: code}
+                { role: 'system', content: contest_prompt },
+                { role: 'user', content: code }
             ],
             temperature: 0,
         })
@@ -117,10 +117,10 @@ const getComplexity = async (code) => {
 const getChat = async (message, problem) => {
     try {
         const response = await openai.chat.completions.create({
-            model: 'gemini-2.0-flash',
+            model: 'gemini-2.5-flash',
             messages: [
-                {role: 'system', content: chat_prompt},
-                {role: 'user', content: `problem Context: ${JSON.stringify(problem)}\nUser Message: ${message}`},
+                { role: 'system', content: chat_prompt },
+                { role: 'user', content: `problem Context: ${JSON.stringify(problem)}\nUser Message: ${message}` },
             ],
             temperature: 0,
         })
